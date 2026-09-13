@@ -1,7 +1,5 @@
-import org.gradle.internal.impldep.com.amazonaws.auth.policy.Principal
-
 plugins {
-    alias(libs.plugins.android.application)
+    id("spendless.android.application")
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.ksp.plugin)
     alias(libs.plugins.kotlin.serializer.plugin)
@@ -41,12 +39,13 @@ android {
 }
 
 dependencies {
+    //val composeBom = platform(libs.androidx.compose.bom)
 
     // Core Libs
     implementation(AndroidX.core.ktx)
     implementation(AndroidX.lifecycle.runtime.ktx)
     implementation(AndroidX.activity.compose)
-    implementation(platform(libs.androidx.compose.bom))
+    implementation(platform(AndroidX.compose.bom))
     implementation(AndroidX.compose.ui)
     implementation(AndroidX.compose.ui.graphics)
     implementation(AndroidX.compose.ui.toolingPreview)
@@ -84,14 +83,17 @@ dependencies {
     // Kotlinx Serialization
     implementation(KotlinX.serialization.json)
 
-    // Accompanist Permissions
-    //implementation(Principal.WebIdentityProviders.Google.accompanist.permissions)
-
     // Logging
     implementation(JakeWharton.timber)
 
     // Desugaring
     coreLibraryDesugaring(libs.desugar.jdk.libs)
+
+    // Biometrics
+    implementation(AndroidX.biometric)
+
+    // Process lifecycle
+    implementation(AndroidX.lifecycle.process)
 
     // Testing
     testImplementation(libs.junit)
@@ -104,7 +106,7 @@ dependencies {
     // Android Tests
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(platform(AndroidX.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
