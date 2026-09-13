@@ -7,9 +7,6 @@ plugins {
 
 android {
     namespace = "dev.tonnie.spendless"
-    compileSdk {
-        version = release(37)
-    }
 
     defaultConfig {
         applicationId = "dev.tonnie.spendless"
@@ -28,18 +25,11 @@ android {
             }
         }
     }
-    compileOptions {
-        isCoreLibraryDesugaringEnabled = true
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
-    }
-    buildFeatures {
-        compose = true
-    }
+
 }
 
 dependencies {
-    //val composeBom = platform(libs.androidx.compose.bom)
+
 
     // Core Libs
     implementation(AndroidX.core.ktx)
@@ -86,8 +76,7 @@ dependencies {
     // Logging
     implementation(JakeWharton.timber)
 
-    // Desugaring
-    coreLibraryDesugaring(libs.desugar.jdk.libs)
+
 
     // Biometrics
     implementation(AndroidX.biometric)
