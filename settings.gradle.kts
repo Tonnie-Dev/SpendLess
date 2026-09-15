@@ -27,4 +27,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "SpendLess"
 include(":app")
- 
+include(":core:model")

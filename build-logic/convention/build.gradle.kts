@@ -43,6 +43,11 @@ gradlePlugin {
             id = "spendless.kotlin.serialization"
             implementationClass = "KotlinSerializationConventionPlugin"
         }
+
+        register("kotlinLibrary") {
+            id = "spendless.kotlin.library"
+            implementationClass = "KotlinLibraryConventionPlugin"
+        }
     }
 
 }

@@ -4,5 +4,6 @@ plugins {
     alias(libs.plugins.ksp.plugin) apply false
     alias(libs.plugins.compose.compiler) apply false
     alias(libs.plugins.kotlin.serializer.plugin) apply false
+    alias(libs.plugins.jetbrains.kotlin.jvm) apply false
 
 }
