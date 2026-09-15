@@ -38,6 +38,11 @@ gradlePlugin {
             id = "spendless.android.ksp"
             implementationClass = "AndroidKspConventionPlugin"
         }
+
+        register("kotlinSerialization") {
+            id = "spendless.kotlin.serialization"
+            implementationClass = "KotlinSerializationConventionPlugin"
+        }
     }
 
 }

@@ -2,7 +2,7 @@ plugins {
     id("spendless.android.application")
     id("spendless.android.compose")
     id("spendless.android.ksp")
-    alias(libs.plugins.kotlin.serializer.plugin)
+    id("spendless.kotlin.serialization")
 }
 
 android {
@@ -88,5 +88,4 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(AndroidX.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
-
 }
