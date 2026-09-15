@@ -1,7 +1,7 @@
 plugins {
     id("spendless.android.application")
-    alias(libs.plugins.compose.compiler)
-    alias(libs.plugins.ksp.plugin)
+    id("spendless.android.compose")
+    id("spendless.android.ksp")
     alias(libs.plugins.kotlin.serializer.plugin)
 }
 
@@ -25,20 +25,13 @@ android {
             }
         }
     }
-
 }
 
 dependencies {
-
-
     // Core Libs
     implementation(AndroidX.core.ktx)
     implementation(AndroidX.lifecycle.runtime.ktx)
     implementation(AndroidX.activity.compose)
-    implementation(platform(AndroidX.compose.bom))
-    implementation(AndroidX.compose.ui)
-    implementation(AndroidX.compose.ui.graphics)
-    implementation(AndroidX.compose.ui.toolingPreview)
 
     // Navigation 3
     implementation(libs.androidx.navigation3.runtime)
@@ -76,8 +69,6 @@ dependencies {
     // Logging
     implementation(JakeWharton.timber)
 
-
-
     // Biometrics
     implementation(AndroidX.biometric)
 
@@ -97,6 +88,5 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(AndroidX.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
-    debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
+
 }

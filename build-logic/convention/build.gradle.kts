@@ -1,6 +1,3 @@
-import org.gradle.kotlin.dsl.`kotlin-dsl`
-import org.jetbrains.kotlin.gradle.internal.backend.common.serialization.metadata.DynamicTypeDeserializer.id
-
 plugins {
     `kotlin-dsl`
 }
@@ -15,7 +12,8 @@ java {
 
 dependencies {
     compileOnly(libs.android.gradlePlugin)
-
+    compileOnly(libs.kotlin.gradlePlugin)
+    implementation(libs.ksp.gradlePlugin)
 }
 
 gradlePlugin {
@@ -29,6 +27,16 @@ gradlePlugin {
         register("androidLibrary") {
             id = "spendless.android.library"
             implementationClass = "AndroidLibraryConventionPlugin"
+        }
+
+        register("androidCompose") {
+            id = "spendless.android.compose"
+            implementationClass = "AndroidComposeConventionPlugin"
+        }
+
+        register("androidKsp") {
+            id = "spendless.android.ksp"
+            implementationClass = "AndroidKspConventionPlugin"
         }
     }
 
