@@ -1,4 +1,4 @@
-package dev.tonnie.spendless.ui.theme
+package dev.tonnie.designsystem.theme
 
 import androidx.compose.ui.graphics.Color
 

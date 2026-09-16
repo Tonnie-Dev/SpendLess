@@ -28,6 +28,8 @@ android {
 }
 
 dependencies {
+    implementation(project(":core:designsystem"))
+
     // Core Libs
     implementation(AndroidX.core.ktx)
     implementation(AndroidX.lifecycle.runtime.ktx)
