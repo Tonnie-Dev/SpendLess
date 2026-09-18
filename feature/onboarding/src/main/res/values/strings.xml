@@ -1,0 +1,62 @@
+<resources>
+    <!-- App Name-->
+
+
+    <!-- Blank Text-->
+    <string name="blank_text" />
+
+    <!-- Top Bar Texts-->
+    <string name="topbar_text_library">Library</string>
+
+    <!-- Bottom Bar Texts-->
+    <string name="bottom_text_auto_rotate">Auto Rotate</string>
+
+    <!--Header Texts-->
+    <string name="header_text_welcome">Welcome to SpendLess!\nHow can we address you?</string>
+
+    <!--Caption Texts-->
+    <string name="caption_text_create_name">Create unique username</string>
+
+    <!--Content Description Texts-->
+    <string name="cds_text_menu">Menu</string>
+
+    <!--Button Texts-->
+    <string name="button_text_next">Next</string>
+
+    <!--Text Button Texts-->
+    <string name="text_button_account_ready">Already have an account</string>
+
+    <!--Label Texts-->
+    <string name="label_text_title">Title</string>
+
+    <!--Dialog Texts-->
+    <string name="dialog_text_delete_book">Delete \"%s\"?</string>
+
+    <!--Snackbar Texts-->
+    <string name="snack_text_book_imported">Book imported</string>
+
+    <!--Toast Texts-->
+    <string name="toast_text_copied">Copied to Clipboard</string>
+
+    <!--Menu Texts-->
+    <string name="menu_text_male">Male</string>
+
+    <!--Supporting Texts-->
+    <string name="sup_text_def_username">Use between 3 and 20 characters for your username.</string>
+
+    <!--Settings Presets-->
+    <string name="settings_sync_interval">Sync Interval</string>
+
+    <!--Placeholder Texts-->
+    <string name="placeholder_text_username">username</string>
+
+    <!--Meta Data Texts-->
+    <string name="dollar_price_tag">$%.2f</string>
+
+    <!--String Templates-->
+    <string name="template_steps_goal">/%1$d %2$s</string>
+
+    <!-- Navigation Drawer Strings -->
+    <string name="nav_drawer_library">Library</string>
+
+</resources>
