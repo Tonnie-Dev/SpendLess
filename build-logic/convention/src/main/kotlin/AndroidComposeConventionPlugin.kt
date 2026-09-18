@@ -66,6 +66,12 @@ class AndroidComposeConventionPlugin : Plugin<Project> {
                         libs.findLibrary("androidx-ui-test-manifest")
                                 .get()
                 )
+
+                add(
+                        "implementation",
+                        libs.findLibrary("androidx-compose-material3")
+                                .get()
+                )
             }
         }
     }

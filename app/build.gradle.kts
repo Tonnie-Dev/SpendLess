@@ -28,6 +28,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":feature:onboarding"))
     implementation(project(":core:designsystem"))
 
     // Core Libs
