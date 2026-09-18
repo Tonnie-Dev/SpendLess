@@ -24,7 +24,7 @@
     <string name="button_text_next">Next</string>
 
     <!--Text Button Texts-->
-    <string name="text_button_account_ready">Already have an account</string>
+    <string name="text_button_account_ready">Already have an account?</string>
 
     <!--Label Texts-->
     <string name="label_text_title">Title</string>

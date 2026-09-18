@@ -16,6 +16,7 @@ data class Dimens(
     val spaceTen: Dp = 10.dp,
     val spaceTwelve: Dp = 12.dp,
     val spaceMedium: Dp = 16.dp,
+    val spaceTwenty: Dp = 20.dp,
     val spaceLarge: Dp = 32.dp,
     val spaceLargeMedium: Dp = 48.dp,
     val spaceFifty: Dp = 50.dp,

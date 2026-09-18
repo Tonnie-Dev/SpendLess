@@ -49,7 +49,7 @@ fun AppButton(
             modifier = modifier
                     .clip(shape = MaterialTheme.shapes.large)
                     .background(containerColor)
-                    .clickable(onClick = onClick)
+                    .clickable(enabled = enabled, onClick = onClick)
                     .fillMaxWidth()
                     .padding(horizontal = MaterialTheme.spacing.spaceTwelve * 2)
                     .padding(vertical = MaterialTheme.spacing.spaceTwelve),

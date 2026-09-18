@@ -119,7 +119,7 @@ private fun TextFieldDecorator(
                 else -> Alignment.CenterStart
             }
     ) {
-        if (isTextFieldEmpty/* && !isFocused*/) {
+        if (isTextFieldEmpty) {
             Text(
                     text = placeholder,
                     style = textStyle.copy(
@@ -127,9 +127,8 @@ private fun TextFieldDecorator(
                             textAlign = textAlign
                     )
             )
-        } else {
-            innerTextField()
         }
+        innerTextField()
     }
 }
 
