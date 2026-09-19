@@ -13,12 +13,17 @@
 
     <!--Header Texts-->
     <string name="header_text_welcome">Welcome to SpendLess!\nHow can we address you?</string>
+    <string name="header_text_create_pin">Create PIN</string>
 
     <!--Caption Texts-->
     <string name="caption_text_create_name">Create unique username</string>
+    <string name="caption_text_create_pin">Use PIN to login to your account</string>
 
     <!--Content Description Texts-->
     <string name="cds_text_menu">Menu</string>
+    <string name="cds_text_back">Back</string>
+    <string name="cds_text_delete_pin_digit">Delete last digit</string>
+    <string name="cds_text_pin_progress">%1$d of %2$d PIN digits entered</string>
 
     <!--Button Texts-->
     <string name="button_text_next">Next</string>
