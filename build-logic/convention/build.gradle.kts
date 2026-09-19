@@ -48,6 +48,11 @@ gradlePlugin {
             id = "spendless.kotlin.library"
             implementationClass = "KotlinLibraryConventionPlugin"
         }
+
+        register("androidKoin") {
+            id = "spendless.android.koin"
+            implementationClass = "AndroidKoinConventionPlugin"
+        }
     }
 
 }

@@ -1,6 +1,7 @@
 plugins {
     id("spendless.android.library")
     id("spendless.android.compose")
+    id("spendless.android.koin")
 }
 
 android {

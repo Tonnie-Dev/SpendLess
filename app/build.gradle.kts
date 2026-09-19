@@ -3,6 +3,7 @@ plugins {
     id("spendless.android.compose")
     id("spendless.android.ksp")
     id("spendless.kotlin.serialization")
+    id("spendless.android.koin")
 }
 
 android {
