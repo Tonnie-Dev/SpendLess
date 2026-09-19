@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.BasicSecureTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
@@ -44,11 +45,42 @@ fun AppInputField(
     backgroundColor: Color = MaterialTheme.colorScheme.surface,
     height: Dp = HEIGHT_SMALL,
     showFocusBorder: Boolean = false,
-    keyboardType: KeyboardType = KeyboardType.Text
+    keyboardType: KeyboardType = KeyboardType.Text,
+    isPassword: Boolean = false,
 ) {
     var isFocused by remember { mutableStateOf(false) }
 
     val isTextFieldEmpty = state.text.isEmpty()
+
+    if (isPassword) {
+        BasicSecureTextField(
+            state = state,
+            modifier = modifier
+                .fillMaxWidth()
+                .height(height)
+                .onFocusChanged { isFocused = it.isFocused },
+            textStyle = textStyle.copy(
+                color = MaterialTheme.colorScheme.onSurface,
+                textAlign = textAlign,
+            ),
+            cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+            keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+            textObfuscationMode = androidx.compose.foundation.text.input.TextObfuscationMode.Hidden,
+            decorator = { innerTextField ->
+                TextFieldDecorator(
+                    innerTextField = innerTextField,
+                    isFocused = isFocused,
+                    isTextFieldEmpty = isTextFieldEmpty,
+                    showFocusBorder = showFocusBorder,
+                    placeholder = placeholder,
+                    textAlign = textAlign,
+                    textStyle = textStyle,
+                    backgroundColor = backgroundColor,
+                )
+            },
+        )
+        return
+    }
 
     BasicTextField(
             modifier = modifier
@@ -71,7 +103,6 @@ fun AppInputField(
                         textAlign = textAlign,
                         textStyle = textStyle,
                         backgroundColor = backgroundColor,
-                        modifier = modifier
                 )
             },
             keyboardOptions = KeyboardOptions(keyboardType = keyboardType)
