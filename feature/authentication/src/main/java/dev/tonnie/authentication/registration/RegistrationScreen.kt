@@ -4,9 +4,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowRight
 import androidx.compose.material3.MaterialTheme
@@ -19,32 +19,46 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import dev.tonnie.authentication.R
+import dev.tonnie.authentication.registration.handling.RegistrationUiEvent
+import dev.tonnie.authentication.registration.handling.RegistrationUiState
 import dev.tonnie.designsystem.components.AppButton
 import dev.tonnie.designsystem.components.AppInputField
 import dev.tonnie.designsystem.icon.AppIcon
 import dev.tonnie.designsystem.theme.OnBackgroundStateLayer08
 import dev.tonnie.designsystem.theme.SpendLessTheme
 import dev.tonnie.designsystem.theme.spacing
-import dev.tonnie.authentication.R
+import dev.tonnie.presentation.BaseContentLayout
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun RegistrationScreen(
+    viewModel: RegistrationViewModel = koinViewModel()
+) {
+    BaseContentLayout(viewModel = viewModel) {
+        RegistrationScreenContent(
+                uiState = it,
+                uiEvent = viewModel::onEvent
+        )
+    }
+}
+
+@Composable
+fun RegistrationScreenContent(
     modifier: Modifier = Modifier,
-    usernameState: TextFieldState,
-    onNextClick: (String) -> Unit,
-    onSignInClick: () -> Unit,
+    uiState: RegistrationUiState,
+    uiEvent: (RegistrationUiEvent) -> Unit,
 ) {
     val spacing = MaterialTheme.spacing
-    val username = usernameState.text.toString()
-            .trim()
 
     Column(
             modifier = modifier
                     .fillMaxSize()
                     .background(MaterialTheme.colorScheme.background)
-                    //  .safeDrawingPadding()
-                    // .imePadding()
-                    .padding(horizontal = HORIZONTAL_PADDING),
+                    .safeDrawingPadding()
+                    .imePadding()
+                    .padding(horizontal = HORIZONTAL_PADDING)
+                    .padding(top = spacing.spaceLarge),
 
             horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -76,7 +90,7 @@ fun RegistrationScreen(
                 verticalArrangement = Arrangement.spacedBy(spacing.spaceMedium)
         ) {
             AppInputField(
-                    state = usernameState,
+                    state = uiState.usernameTextFieldState,
                     placeholder = stringResource(R.string.placeholder_text_username),
                     textStyle = MaterialTheme.typography.headlineLarge,
                     textAlign = TextAlign.Center,
@@ -86,13 +100,13 @@ fun RegistrationScreen(
 
             AppButton(
                     buttonText = stringResource(R.string.button_text_next),
-                    enabled = username.isNotBlank(),
+                    enabled = uiState.nextButtonEnabled,
                     trailingIcon = Icons.AutoMirrored.Filled.ArrowRight,
-                    onClick = { onNextClick(username) },
+                    onClick = { uiEvent(RegistrationUiEvent.NextClicked) },
             )
         }
 
-        TextButton(onClick = onSignInClick) {
+        TextButton(onClick = { uiEvent(RegistrationUiEvent.SignInClicked) }) {
             Text(
                     text = stringResource(R.string.text_button_account_ready),
                     style = MaterialTheme.typography.titleMedium,
@@ -105,12 +119,11 @@ private val HORIZONTAL_PADDING = 26.dp
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-private fun RegistrationScreenPreview() {
+private fun RegistrationScreenContentPreview() {
     SpendLessTheme {
-        RegistrationScreen(
-                usernameState = rememberTextFieldState(),
-                onNextClick = {},
-                onSignInClick = {}
+        RegistrationScreenContent(
+                uiState = RegistrationUiState(),
+                uiEvent = {}
         )
     }
 }

@@ -1,5 +1,6 @@
 plugins {
     id("spendless.kotlin.library")
+    id("spendless.kotlin.koin")
 }
 
 dependencies {

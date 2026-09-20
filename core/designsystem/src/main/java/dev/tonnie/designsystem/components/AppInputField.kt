@@ -140,7 +140,6 @@ private fun TextFieldDecorator(
                                 Modifier
                             }
                     )
-
                     .padding(horizontal = MaterialTheme.spacing.spaceMedium)
                     .padding(vertical = MaterialTheme.spacing.spaceTwelve),
             contentAlignment = when (textAlign) {
@@ -154,8 +153,8 @@ private fun TextFieldDecorator(
             Text(
                     text = placeholder,
                     style = textStyle.copy(
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            textAlign = textAlign
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                            textAlign = TextAlign.Start
                     )
             )
         }

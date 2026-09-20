@@ -29,8 +29,12 @@ android {
 }
 
 dependencies {
-    implementation(project(":feature:authentication"))
+    //Modules
     implementation(project(":core:designsystem"))
+    implementation(project(":core:database"))
+    implementation(project(":core:data"))
+    implementation(project(":core:domain"))
+    implementation(project(":feature:authentication"))
 
     // Core Libs
     implementation(AndroidX.core.ktx)

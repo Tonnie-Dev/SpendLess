@@ -1,6 +1,10 @@
 package dev.tonnie.spendless
 
 import android.app.Application
+import dev.tonnie.authentication.di.authenticationModule
+import dev.tonnie.data.di.dataModule
+import dev.tonnie.database.di.databaseModule
+import dev.tonnie.domain.di.domainModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
@@ -12,7 +16,12 @@ class SpendLessApp : Application(){
         startKoin {
             androidLogger()
             androidContext(this@SpendLessApp)
-           // modules(appModule)
+            modules(
+                    databaseModule,
+                    dataModule,
+                    domainModule,
+                    authenticationModule
+            )
         }
     }
 }
