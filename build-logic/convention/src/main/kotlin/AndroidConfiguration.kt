@@ -3,8 +3,6 @@ import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.dependencies
 
-
-
 internal fun Project.configureAndroidCommon(
     commonExtension: CommonExtension,
 ) {

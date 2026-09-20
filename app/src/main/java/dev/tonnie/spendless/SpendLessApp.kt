@@ -12,7 +12,7 @@ class SpendLessApp : Application(){
         startKoin {
             androidLogger()
             androidContext(this@SpendLessApp)
-            modules(appModule)
+           // modules(appModule)
         }
     }
 }

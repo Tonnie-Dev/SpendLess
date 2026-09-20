@@ -1,5 +1,5 @@
 plugins {
-    alias(libs.plugins.android.library)
+    id("spendless.android.library")
 }
 
 android {
