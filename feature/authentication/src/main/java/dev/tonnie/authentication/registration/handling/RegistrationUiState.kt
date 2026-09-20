@@ -1,9 +1,12 @@
 package dev.tonnie.authentication.registration.handling
 
+import androidx.annotation.StringRes
+import androidx.compose.foundation.text.input.TextFieldState
 import dev.tonnie.presentation.handling.UiState
 
 data class RegistrationUiState(
-    val username: String = "",
+    val usernameTextFieldState: TextFieldState = TextFieldState(),
     val isLoading: Boolean = false,
-    val error: String? = null,
-): UiState
+    @StringRes val error: Int? = null,
+    val nextButtonEnabled: Boolean = false
+) : UiState

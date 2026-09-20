@@ -38,6 +38,10 @@
     <string name="placeholder_text_username">username</string>
     <string name="placeholder_text_pin">PIN</string>
 
+    <!--Banner Texts-->
+    <string name="banner_text_username_taken">This username has already been taken!</string>
+    <string name="banner_text_generic_error">An error occurred. Please try again.</string>
+
     <!--Label Texts-->
     <string name="label_text_title">Title</string>
 
