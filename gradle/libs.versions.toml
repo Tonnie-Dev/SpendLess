@@ -8,9 +8,9 @@ jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrai
 android-library = { id = "com.android.library", version.ref = "agp" }
 
 [versions]
-agp = "9.4.0"
+agp = "9.4.1"
 kotlin = "2.4.20"
-ksp = "2.3.2"
+ksp = "2.3.6"
 adaptive = "1.3.0"
 kxml2 = "2.3.0"
 nav3Core = "1.1.7"
