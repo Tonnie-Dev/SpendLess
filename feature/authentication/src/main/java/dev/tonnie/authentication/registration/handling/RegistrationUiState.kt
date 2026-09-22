@@ -8,5 +8,6 @@ data class RegistrationUiState(
     val usernameTextFieldState: TextFieldState = TextFieldState(),
     val isLoading: Boolean = false,
     @StringRes val error: Int? = null,
+    @StringRes val usernameError: Int? = null,
     val nextButtonEnabled: Boolean = false
 ) : UiState

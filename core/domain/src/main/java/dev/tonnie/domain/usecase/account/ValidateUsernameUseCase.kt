@@ -13,6 +13,11 @@ class ValidateUsernameUseCase {
         if (!username.matches(USERNAME_REGEX)) {
             return Resource.Error(DataError.InvalidUsernameFormat)
         }
+
+        if (username.none { it.isLetter() }) {
+            return Resource.Error(DataError.InvalidUsernameFormat)
+        }
+
         return Resource.Success(true)
     }
 

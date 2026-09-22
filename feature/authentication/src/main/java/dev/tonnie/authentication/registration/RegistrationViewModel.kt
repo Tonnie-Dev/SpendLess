@@ -2,6 +2,7 @@
 
 package dev.tonnie.authentication.registration
 
+import androidx.annotation.StringRes
 import androidx.compose.runtime.snapshotFlow
 import dev.tonnie.authentication.R
 import dev.tonnie.authentication.registration.handling.RegistrationActionEvent
@@ -33,8 +34,7 @@ class RegistrationViewModel(
             }
 
             RegistrationUiEvent.SignInClicked -> {
-
-                // Handle sign-in clicked
+                onSignInClicked()
             }
         }
     }
@@ -45,7 +45,32 @@ class RegistrationViewModel(
                     .map { it.trim() }
                     .collect { username ->
 
-                        val isValid = when (validateUsernameUseCase.invoke(username)) {
+                        when(val result = validateUsernameUseCase(username)){
+
+                            is Resource.Success -> {
+                                updateState { state ->
+                                    state.copy(
+                                            nextButtonEnabled = true,
+                                            error = null,
+                                            usernameError = null
+                                    )
+                                }
+
+                        }
+
+                            is Resource.Error -> {
+                                updateState { state ->
+                                    state.copy(
+                                            nextButtonEnabled = false,
+
+                                            usernameError = result.error.toUsernameError(username)
+                                    )
+                                }
+                            }
+
+                        }
+
+                    /*    val isValid = when (validateUsernameUseCase.invoke(username)) {
                             is Resource.Success -> true
                             is Resource.Error -> false
                         }
@@ -54,7 +79,7 @@ class RegistrationViewModel(
                                     nextButtonEnabled = isValid,
                                     error = null
                             )
-                        }
+                        }*/
                     }
         }
     }
@@ -81,7 +106,7 @@ class RegistrationViewModel(
                     }
 
                     sendActionEvent(RegistrationActionEvent.NavigateToCreatePin(username))
-                    TODO("Navigate to next screen")
+
                 }
 
                 is Resource.Error -> {
@@ -111,5 +136,28 @@ class RegistrationViewModel(
                 }
             }
         }
+    }
+
+    private fun onSignInClicked() {
+        sendActionEvent(RegistrationActionEvent.NavigateToLogin)
+    }
+}
+
+@StringRes
+private fun DataError.toUsernameError(username: String): Int? {
+    return when (this) {
+        DataError.InvalidUsernameLength -> {
+            if (username.length > 14) {
+                R.string.supporting_text_username_error_length
+            } else {
+                null
+            }
+        }
+
+        DataError.InvalidUsernameFormat -> {
+            R.string.supporting_text_username_error_format
+        }
+
+        else -> null
     }
 }

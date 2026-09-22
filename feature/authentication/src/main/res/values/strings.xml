@@ -42,6 +42,13 @@
     <string name="banner_text_username_taken">This username has already been taken!</string>
     <string name="banner_text_generic_error">An error occurred. Please try again.</string>
 
+    <!--Supporting Texts-->
+    <string name="supporting_text_username_error_format">
+    Use letters and numbers, with at least one letter
+</string>
+    <string name="supporting_text_username_error_length">
+    Username cannot exceed 14 characters
+</string>
     <!--Label Texts-->
     <string name="label_text_title">Title</string>
 
@@ -56,9 +63,6 @@
 
     <!--Menu Texts-->
     <string name="menu_text_male">Male</string>
-
-    <!--Supporting Texts-->
-    <string name="sup_text_def_username">Use between 3 and 20 characters for your username.</string>
 
     <!--Settings Presets-->
     <string name="settings_sync_interval">Sync Interval</string>

@@ -36,22 +36,53 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import dev.tonnie.authentication.R
+import dev.tonnie.authentication.pin.handling.PinActionEvent
+import dev.tonnie.authentication.pin.handling.PinUiEvent
+import dev.tonnie.authentication.pin.handling.PinUiState
+import dev.tonnie.authentication.pin.handling.PinViewModel
 import dev.tonnie.designsystem.icon.AppIcon
 import dev.tonnie.designsystem.theme.OnSurfaceStateLayer12
 import dev.tonnie.designsystem.theme.SpendLessTheme
 import dev.tonnie.designsystem.theme.spacing
-import dev.tonnie.authentication.R
+import dev.tonnie.presentation.BaseContentLayout
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
-/** The caller owns PIN state and handles completion when [onPinChange] delivers five digits.
- * Apply the host's system-bar padding through [modifier], as with RegistrationScreen.
- */
 @Composable
 fun PinScreen(
-    pin: String,
-    onPinChange: (String) -> Unit,
-    onBackClick: () -> Unit,
+    username: String?,
+    viewModel: PinViewModel = koinViewModel(
+            parameters = { parametersOf(username) }
+    ),
+    onNavigateToLogin: () -> Unit,
+) {
+
+    BaseContentLayout(
+            viewModel = viewModel,
+            actionEventHandler = { _, actionEvent ->
+                when (actionEvent) {
+                    is PinActionEvent.NavigateBack -> onNavigateToLogin()
+
+                }
+            }
+    ) { state ->
+
+        PinScreenContent(
+                uiState = state,
+                onEvent = viewModel::onEvent,
+        )
+    }
+
+}
+
+@Composable
+private fun PinScreenContent(
+    uiState: PinUiState,
+    onEvent: (PinUiEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val pin = uiState.pin
     val progress = stringResource(R.string.cds_text_pin_progress, pin.length, PIN_LENGTH)
 
     val spacing = MaterialTheme.spacing
@@ -72,10 +103,10 @@ fun PinScreen(
                         )
         ) {
             IconButton(
-                    onClick = onBackClick,
+                    onClick = { onEvent(PinUiEvent.ExitPinScreen) },
                     modifier = Modifier
                             .align(Alignment.TopStart)
-                            .padding(start = 4.dp),
+                            .padding(start = spacing.spaceSmall),
             ) {
                 Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -100,12 +131,11 @@ fun PinScreen(
 
             Text(
                     text = stringResource(R.string.caption_text_create_pin),
-                    modifier = Modifier.padding(horizontal = 24.dp),
+                    modifier = Modifier.padding(horizontal = spacing.spaceTwelve * 2),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
             )
-
         }
 
         Row(
@@ -130,10 +160,10 @@ fun PinScreen(
         }
         Column(
                 modifier = Modifier
-                        .widthIn(max = 400.dp)
+                        .widthIn(max = MAX_WIDTH)
                         .fillMaxWidth()
-                        .padding(horizontal = 38.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp),
+                        .padding(horizontal = HORIZONTAL_PADDING),
+                verticalArrangement = Arrangement.spacedBy(spacing.spaceExtraSmall),
         ) {
             listOf(
                     listOf(1, 2, 3),
@@ -160,8 +190,8 @@ fun PinScreen(
                                         MaterialTheme.colorScheme.primaryFixed,
                                     contentColor = MaterialTheme.colorScheme.onPrimaryFixed,
                                     onClick = {
-                                        if (isDelete) onPinChange(pin.dropLast(1))
-                                        else if (pin.length < PIN_LENGTH) onPinChange(pin + digit)
+                                        if (isDelete) onEvent(PinUiEvent.PressPinBackspace)
+                                        else onEvent(PinUiEvent.PressPinDigit(digit.toString()))
                                     }
                             ) {
                                 Box(contentAlignment = Alignment.Center) {
@@ -169,7 +199,7 @@ fun PinScreen(
                                         Icon(
                                                 imageVector = Icons.AutoMirrored.Filled.Backspace,
                                                 contentDescription = stringResource(R.string.cds_text_delete_pin_digit),
-                                                modifier = Modifier.size(28.dp),
+                                                modifier = Modifier.size(DELETE_BUTTON_SIZE),
                                         )
                                     } else {
                                         Text(
@@ -187,13 +217,19 @@ fun PinScreen(
     }
 }
 
-private const val PIN_LENGTH = 5
+private val MAX_WIDTH = 400.dp
+private val HORIZONTAL_PADDING = 40.dp
+private val DELETE_BUTTON_SIZE = 28.dp
 private val PIN_BOX_SIZE = 18.dp
+private const val PIN_LENGTH = 5
 
 @Preview(showBackground = true, widthDp = 400, heightDp = 800)
 @Composable
-private fun PinScreenPreview() {
+private fun PinScreenContentPreview() {
     SpendLessTheme {
-        PinScreen(pin = "123", onPinChange = {}, onBackClick = {})
+        PinScreenContent(
+                uiState = PinUiState(),
+                onEvent = {}
+        )
     }
 }

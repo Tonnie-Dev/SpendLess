@@ -1,5 +1,6 @@
 package dev.tonnie.designsystem.components
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -8,9 +9,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.BasicSecureTextField
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.TextFieldDecorator
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.MaterialTheme
@@ -25,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -47,66 +50,88 @@ fun AppInputField(
     showFocusBorder: Boolean = false,
     keyboardType: KeyboardType = KeyboardType.Text,
     isPassword: Boolean = false,
-) {
+    @StringRes
+    errorMessageRes: Int? = null,
+    ) {
+    val isError = errorMessageRes != null
     var isFocused by remember { mutableStateOf(false) }
 
     val isTextFieldEmpty = state.text.isEmpty()
 
+    val spacing = MaterialTheme.spacing
+
     if (isPassword) {
         BasicSecureTextField(
-            state = state,
-            modifier = modifier
-                .fillMaxWidth()
-                .height(height)
-                .onFocusChanged { isFocused = it.isFocused },
-            textStyle = textStyle.copy(
-                color = MaterialTheme.colorScheme.onSurface,
-                textAlign = textAlign,
-            ),
-            cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-            keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
-            textObfuscationMode = androidx.compose.foundation.text.input.TextObfuscationMode.Hidden,
-            decorator = { innerTextField ->
-                TextFieldDecorator(
-                    innerTextField = innerTextField,
-                    isFocused = isFocused,
-                    isTextFieldEmpty = isTextFieldEmpty,
-                    showFocusBorder = showFocusBorder,
-                    placeholder = placeholder,
-                    textAlign = textAlign,
-                    textStyle = textStyle,
-                    backgroundColor = backgroundColor,
-                )
-            },
+                state = state,
+                modifier = modifier
+                        .fillMaxWidth()
+                        .height(height)
+                        .onFocusChanged { isFocused = it.isFocused },
+                textStyle = textStyle.copy(
+                        color = MaterialTheme.colorScheme.onSurface,
+                        textAlign = textAlign,
+                ),
+                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+                textObfuscationMode = androidx.compose.foundation.text.input.TextObfuscationMode.Hidden,
+                decorator = { innerTextField ->
+                    TextFieldDecorator(
+                            innerTextField = innerTextField,
+                            isFocused = isFocused,
+                            isTextFieldEmpty = isTextFieldEmpty,
+                            showFocusBorder = showFocusBorder,
+                            placeholder = placeholder,
+                            textAlign = textAlign,
+                            textStyle = textStyle,
+                            backgroundColor = backgroundColor,
+                    )
+                },
         )
         return
     }
 
-    BasicTextField(
-            modifier = modifier
-                    .fillMaxWidth()
-                    .height(height)
-                    .onFocusChanged { isFocused = it.isFocused },
-            state = state,
-            textStyle = textStyle.copy(
-                    color = MaterialTheme.colorScheme.onSurface,
-                    textAlign = textAlign
-            ),
-            cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-            decorator = { innerTextField ->
-                TextFieldDecorator(
-                        isFocused = isFocused,
-                        innerTextField = innerTextField,
-                        placeholder = placeholder,
-                        isTextFieldEmpty = isTextFieldEmpty,
-                        showFocusBorder = showFocusBorder,
-                        textAlign = textAlign,
-                        textStyle = textStyle,
-                        backgroundColor = backgroundColor,
+    Column(verticalArrangement = Arrangement.spacedBy(space = spacing.spaceDoubleDp)) {
+        BasicTextField(
+                modifier = modifier
+                        .fillMaxWidth()
+                        .height(height)
+                        .onFocusChanged { isFocused = it.isFocused },
+                state = state,
+                textStyle = textStyle.copy(
+                        color = if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface,
+                        textAlign = textAlign
+                ),
+                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                decorator = { innerTextField ->
+                    TextFieldDecorator(
+                            isFocused = isFocused,
+                            innerTextField = innerTextField,
+                            placeholder = placeholder,
+                            isTextFieldEmpty = isTextFieldEmpty,
+                            showFocusBorder = showFocusBorder,
+                            textAlign = textAlign,
+                            textStyle = textStyle,
+                            backgroundColor = backgroundColor,
+                    )
+                },
+                keyboardOptions = KeyboardOptions(keyboardType = keyboardType)
+        )
+
+
+            if (errorMessageRes != null) {
+                Text(
+                        text = stringResource(errorMessageRes),
+                        modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.error,
+                        textAlign = TextAlign.Start
                 )
-            },
-            keyboardOptions = KeyboardOptions(keyboardType = keyboardType)
-    )
+            }
+
+
+    }
 }
 
 @Composable

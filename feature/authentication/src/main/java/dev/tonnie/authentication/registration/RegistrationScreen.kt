@@ -20,6 +20,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import dev.tonnie.authentication.R
+import dev.tonnie.authentication.registration.handling.RegistrationActionEvent
 import dev.tonnie.authentication.registration.handling.RegistrationUiEvent
 import dev.tonnie.authentication.registration.handling.RegistrationUiState
 import dev.tonnie.designsystem.components.AppButton
@@ -33,9 +34,20 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun RegistrationScreen(
+    onNavigateToPin: (String) -> Unit,
+    onNavigateToLogin: () -> Unit,
     viewModel: RegistrationViewModel = koinViewModel()
 ) {
-    BaseContentLayout(viewModel = viewModel) {
+    BaseContentLayout(
+            viewModel = viewModel,
+            actionEventHandler = { _, actionEvent ->
+
+                when (actionEvent) {
+                    RegistrationActionEvent.NavigateToLogin -> onNavigateToLogin()
+                    is RegistrationActionEvent.NavigateToCreatePin -> onNavigateToPin(actionEvent.username)
+                }
+            }
+    ) {
         RegistrationScreenContent(
                 uiState = it,
                 uiEvent = viewModel::onEvent
@@ -44,7 +56,7 @@ fun RegistrationScreen(
 }
 
 @Composable
-fun RegistrationScreenContent(
+private fun RegistrationScreenContent(
     modifier: Modifier = Modifier,
     uiState: RegistrationUiState,
     uiEvent: (RegistrationUiEvent) -> Unit,
@@ -96,6 +108,7 @@ fun RegistrationScreenContent(
                     textAlign = TextAlign.Center,
                     backgroundColor = OnBackgroundStateLayer08,
                     height = spacing.spaceExtraLarge,
+                    errorMessageRes = uiState.usernameError
             )
 
             AppButton(
