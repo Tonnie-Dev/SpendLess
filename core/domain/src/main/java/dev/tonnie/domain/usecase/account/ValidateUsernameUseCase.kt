@@ -1,12 +1,14 @@
 package dev.tonnie.domain.usecase.account
 
+import dev.tonnie.domain.constants.AccountConstants.USERNAME_MAX_LENGTH
+import dev.tonnie.domain.constants.AccountConstants.USERNAME_MIN_LENGTH
 import dev.tonnie.exceptions.DataError
 import dev.tonnie.exceptions.Resource
 
 class ValidateUsernameUseCase {
 
     operator fun invoke(username: String): Resource<Boolean> {
-        if (username.length !in 3..14) {
+        if (username.length !in USERNAME_MIN_LENGTH..USERNAME_MAX_LENGTH) {
             return Resource.Error(DataError.InvalidUsernameLength)
         }
 

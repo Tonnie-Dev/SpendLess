@@ -21,11 +21,8 @@ class AccountRepositoryImpl(private val accountDao: AccountDao) : AccountReposit
         account: Account,
         encryptedPin: String
     ): Resource<Unit> {
-
-
         return safeIoCall {
            val entity = account.toEntity(encryptedPin = encryptedPin)
-
             accountDao.insert(entity) }
     }
 }

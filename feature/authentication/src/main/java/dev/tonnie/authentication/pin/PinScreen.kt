@@ -40,11 +40,11 @@ import dev.tonnie.authentication.R
 import dev.tonnie.authentication.pin.handling.PinActionEvent
 import dev.tonnie.authentication.pin.handling.PinUiEvent
 import dev.tonnie.authentication.pin.handling.PinUiState
-import dev.tonnie.authentication.pin.handling.PinViewModel
 import dev.tonnie.designsystem.icon.AppIcon
 import dev.tonnie.designsystem.theme.OnSurfaceStateLayer12
 import dev.tonnie.designsystem.theme.SpendLessTheme
 import dev.tonnie.designsystem.theme.spacing
+import dev.tonnie.domain.constants.AccountConstants.PIN_LENGTH
 import dev.tonnie.presentation.BaseContentLayout
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -67,13 +67,11 @@ fun PinScreen(
                 }
             }
     ) { state ->
-
         PinScreenContent(
                 uiState = state,
                 onEvent = viewModel::onEvent,
         )
     }
-
 }
 
 @Composable
@@ -221,7 +219,7 @@ private val MAX_WIDTH = 400.dp
 private val HORIZONTAL_PADDING = 40.dp
 private val DELETE_BUTTON_SIZE = 28.dp
 private val PIN_BOX_SIZE = 18.dp
-private const val PIN_LENGTH = 5
+
 
 @Preview(showBackground = true, widthDp = 400, heightDp = 800)
 @Composable

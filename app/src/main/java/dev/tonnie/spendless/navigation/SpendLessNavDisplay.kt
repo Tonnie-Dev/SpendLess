@@ -19,17 +19,15 @@ fun SpendlessNavDisplay() {
         Navigator(backStack = backStack)
     }
 
-
     val entryProvider = entryProvider {
-
         entry<RegistrationDestination> {
             RegistrationScreen(
                     onNavigateToPin = navigator::navigateToPin,
                     onNavigateToLogin = navigator::navigateToLogin
             )
         }
-        entry<PinDestination> {
 
+        entry<PinDestination> {
             PinScreen(
                     username = it.username,
                     onNavigateToLogin = navigator::navigateToLogin
