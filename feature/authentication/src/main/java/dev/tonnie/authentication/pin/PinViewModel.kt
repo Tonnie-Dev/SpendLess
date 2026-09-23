@@ -45,6 +45,7 @@ class PinViewModel(
     }
 
     private fun enterConfirmPinStage() {
+        createdPin = currentState.pin
         updateState { state ->
             state.copy(
                     pin = "",
