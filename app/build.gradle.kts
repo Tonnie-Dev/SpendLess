@@ -35,6 +35,7 @@ dependencies {
     implementation(project(":core:data"))
     implementation(project(":core:domain"))
     implementation(project(":feature:authentication"))
+    implementation(project(":feature:dashboard"))
 
     // Core Libs
     implementation(AndroidX.core.ktx)
@@ -85,8 +86,8 @@ dependencies {
 
     // Testing
     testImplementation(libs.junit)
-    testImplementation(libs.kotlinTest)
     testImplementation(libs.junit.jupiter)
+    testImplementation(libs.kotlinTest)
     testImplementation(Testing.Kotest.assertions.core)
     testImplementation(Testing.Kotest.runner.junit5)
     testImplementation(libs.kxml2)

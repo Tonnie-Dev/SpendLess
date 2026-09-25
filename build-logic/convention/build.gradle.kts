@@ -59,6 +59,13 @@ gradlePlugin {
             implementationClass =
                 "KotlinKoinConventionPlugin"
         }
+
+        plugins {
+            register("testing") {
+                id = "spendless.testing"
+                implementationClass = "TestingConventionPlugin"
+            }
+        }
     }
 
 }
