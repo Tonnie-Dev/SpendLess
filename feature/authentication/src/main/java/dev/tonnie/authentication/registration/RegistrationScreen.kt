@@ -1,7 +1,11 @@
 package dev.tonnie.authentication.registration
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
@@ -24,6 +28,7 @@ import dev.tonnie.authentication.registration.handling.RegistrationActionEvent
 import dev.tonnie.authentication.registration.handling.RegistrationUiEvent
 import dev.tonnie.authentication.registration.handling.RegistrationUiState
 import dev.tonnie.designsystem.components.AppButton
+import dev.tonnie.designsystem.components.AppErrorBanner
 import dev.tonnie.designsystem.components.AppInputField
 import dev.tonnie.designsystem.icon.AppIcon
 import dev.tonnie.designsystem.theme.OnBackgroundStateLayer08
@@ -62,68 +67,104 @@ private fun RegistrationScreenContent(
     uiEvent: (RegistrationUiEvent) -> Unit,
 ) {
     val spacing = MaterialTheme.spacing
-
-    Column(
+    Box(
             modifier = modifier
                     .fillMaxSize()
                     .background(MaterialTheme.colorScheme.background)
                     .safeDrawingPadding()
                     .imePadding()
-                    .padding(horizontal = HORIZONTAL_PADDING)
-                    .padding(top = spacing.spaceLarge),
-
-            horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-
-        AppIcon(modifier = Modifier.padding(top = spacing.spaceLarge, bottom = spacing.spaceTwenty))
-
         Column(
-                modifier = Modifier.padding(bottom = spacing.spaceLarge),
+                modifier = Modifier
+                        .padding(horizontal = HORIZONTAL_PADDING)
+                        .padding(top = spacing.spaceLarge),
+
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(spacing.spaceSmall)
         ) {
-            Text(
-                    text = stringResource(R.string.header_text_welcome),
-                    style = MaterialTheme.typography.headlineMedium,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    textAlign = TextAlign.Center,
+
+            AppIcon(
+                    modifier = Modifier.padding(
+                            top = spacing.spaceLarge,
+                            bottom = spacing.spaceTwenty
+                    )
             )
 
-            Text(
-                    text = stringResource(R.string.caption_text_create_name),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.Center,
-            )
+            Column(
+                    modifier = Modifier.padding(bottom = spacing.spaceLarge),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(spacing.spaceSmall)
+            ) {
+                Text(
+                        text = stringResource(R.string.header_text_welcome),
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        textAlign = TextAlign.Center,
+                )
+
+                Text(
+                        text = stringResource(R.string.caption_text_create_name),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center,
+                )
+            }
+
+            Column(
+                    modifier = Modifier.padding(bottom = spacing.spaceLarge),
+                    verticalArrangement = Arrangement.spacedBy(spacing.spaceMedium)
+            ) {
+                AppInputField(
+                        state = uiState.usernameTextFieldState,
+                        placeholder = stringResource(R.string.placeholder_text_username),
+                        textStyle = MaterialTheme.typography.headlineLarge,
+                        textAlign = TextAlign.Center,
+                        backgroundColor = OnBackgroundStateLayer08,
+                        height = spacing.spaceExtraLarge,
+                        errorMessageRes = uiState.usernameInputError
+                )
+
+                AppButton(
+                        buttonText = stringResource(R.string.button_text_next),
+                        enabled = uiState.nextButtonEnabled,
+                        trailingIcon = Icons.AutoMirrored.Filled.ArrowRight,
+                        onClick = { uiEvent(RegistrationUiEvent.NextClicked) },
+                )
+            }
+
+            TextButton(onClick = { uiEvent(RegistrationUiEvent.SignInClicked) }) {
+                Text(
+                        text = stringResource(R.string.text_button_account_ready),
+                        style = MaterialTheme.typography.titleMedium,
+                )
+            }
         }
 
-        Column(
-                modifier = Modifier.padding(bottom = spacing.spaceLarge),
-                verticalArrangement = Arrangement.spacedBy(spacing.spaceMedium)
+        val error = uiState.error
+        AnimatedVisibility(
+                modifier = Modifier.align(Alignment.BottomCenter),
+                visible = error != null,
+                enter = slideInVertically { it },
+                exit = slideOutVertically { it }
         ) {
-            AppInputField(
-                    state = uiState.usernameTextFieldState,
-                    placeholder = stringResource(R.string.placeholder_text_username),
-                    textStyle = MaterialTheme.typography.headlineLarge,
-                    textAlign = TextAlign.Center,
-                    backgroundColor = OnBackgroundStateLayer08,
-                    height = spacing.spaceExtraLarge,
-                    errorMessageRes = uiState.usernameError
-            )
 
-            AppButton(
-                    buttonText = stringResource(R.string.button_text_next),
-                    enabled = uiState.nextButtonEnabled,
-                    trailingIcon = Icons.AutoMirrored.Filled.ArrowRight,
-                    onClick = { uiEvent(RegistrationUiEvent.NextClicked) },
-            )
-        }
+            error?.let { errorRes ->
 
-        TextButton(onClick = { uiEvent(RegistrationUiEvent.SignInClicked) }) {
-            Text(
-                    text = stringResource(R.string.text_button_account_ready),
-                    style = MaterialTheme.typography.titleMedium,
-            )
+                val bannerMessage = when (errorRes) {
+                    R.string.banner_text_username_taken -> {
+                        stringResource(
+                                R.string.banner_text_username_taken,
+                                uiState.unavailableUsername.orEmpty()
+                        )
+                    }
+
+                    else -> stringResource(errorRes)
+                }
+                AppErrorBanner(
+                        modifier = Modifier.align(Alignment.BottomCenter),
+                        text = bannerMessage
+
+                )
+            }
         }
     }
 }

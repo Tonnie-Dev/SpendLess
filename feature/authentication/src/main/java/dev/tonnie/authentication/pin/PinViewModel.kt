@@ -1,17 +1,19 @@
 package dev.tonnie.authentication.pin
 
-import android.provider.ContactsContract.PinnedPositions.pin
 import dev.tonnie.authentication.pin.handling.PinActionEvent
 import dev.tonnie.authentication.pin.handling.PinStage
 import dev.tonnie.authentication.pin.handling.PinUiEvent
 import dev.tonnie.authentication.pin.handling.PinUiState
 import dev.tonnie.domain.constants.AccountConstants.PIN_LENGTH
+import dev.tonnie.domain.usecase.account.CreateAccountUseCase
+import dev.tonnie.exceptions.Resource
 import dev.tonnie.presentation.BaseViewModel
 
 typealias PinBaseViewModel = BaseViewModel<PinUiState, PinUiEvent, PinActionEvent>
 
 class PinViewModel(
-    private val username: String?
+    private val username: String?,
+    private val createAccountUseCase: CreateAccountUseCase
 ) : PinBaseViewModel(initialState = PinUiState()) {
 
     private var createdPin: String? = null
@@ -33,7 +35,7 @@ class PinViewModel(
 
         val updatedPin = currentState.pin + digit
 
-        updateState { state -> state.copy(pin = updatedPin, mismatchError = false) }
+        updateState { state -> state.copy(pin = updatedPin, pinMismatchError = false) }
 
         if (updatedPin.length == PIN_LENGTH) {
             onPinCompleted()
@@ -50,7 +52,7 @@ class PinViewModel(
             state.copy(
                     pin = "",
                     pinStage = PinStage.CONFIRM,
-                    mismatchError = false
+                    pinMismatchError = false
             )
         }
     }
@@ -75,19 +77,50 @@ class PinViewModel(
         updateState { state ->
             state.copy(
                     pin = "",
-                    mismatchError = true
+                    pinMismatchError = true
             )
         }
     }
 
     private fun onPinsMatch() {
-val usernameToSave = username ?: return
-       // val pin = encryptedPin ?: return
+        createAccount()
+    }
 
-        //createAccount(usernameToSave, pin)
+    private fun createAccount() {
+        val username = this.username ?: return
+        val pin = currentState.pin
+
+        updateState { state ->
+            state.copy(
+                    isCreatingAccount = true,
+                    accountCreationError = false
+            )
+        }
+
+        launch {
+            when (createAccountUseCase(username, pin)) {
+                is Resource.Success -> {
+                    sendActionEvent(PinActionEvent.NavigateToDashboard)
+                }
+
+                is Resource.Error -> {
+                    updateState { state ->
+                        state.copy(
+                               isCreatingAccount = false,
+                                accountCreationError = true)
+                    }
+                }
+            }
+        }
     }
 
     private fun exitPinScreen() {
-        sendActionEvent(PinActionEvent.NavigateBack)
-    }
+
+            if (username != null) {
+                sendActionEvent(PinActionEvent.NavigateBack)
+            } else {
+                sendActionEvent(PinActionEvent.NavigateToLogin)
+            }
+        }
+
 }

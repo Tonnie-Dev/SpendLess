@@ -9,5 +9,5 @@ interface AccountRepository {
 
     suspend fun getAccount(username: String): Resource<Account?>
 
-    suspend fun createAccount(account: Account, encryptedPin: String): Resource<Unit>
+    suspend fun createAccount(account: Account, pinHash: String): Resource<Unit>
 }

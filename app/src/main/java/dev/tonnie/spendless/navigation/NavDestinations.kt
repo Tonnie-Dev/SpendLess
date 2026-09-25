@@ -10,6 +10,12 @@ data class PinDestination(val username:String? = null) : NavKey
 
 @Serializable
 data object LoginDestination : NavKey
+
+
+
+@Serializable
+data object DashboardDestination : NavKey
+
 /*
 @Serializable
 data class PinDestination(
@@ -24,5 +30,6 @@ sealed interface PinMode {
     ) : PinMode
 
     @Serializable
-    data object Verify : PinMode
-}*/
+    data object Unlock : PinMode
+}
+*/

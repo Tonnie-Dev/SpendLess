@@ -9,6 +9,6 @@ data class AccountEntity(
     @PrimaryKey
     @ColumnInfo(name = "username", collate = ColumnInfo.NOCASE)
     val username: String,
-    @ColumnInfo(name = "encrypted_pin")
-    val encryptedPin: String,
+    @ColumnInfo(name = "pin_hash")
+    val pinHash: String,
 )

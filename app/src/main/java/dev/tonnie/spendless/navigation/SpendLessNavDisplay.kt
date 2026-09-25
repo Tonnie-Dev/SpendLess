@@ -9,6 +9,7 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import dev.tonnie.authentication.pin.PinScreen
 import dev.tonnie.authentication.registration.RegistrationScreen
+import dev.tonnie.dashboard.DashboardScreen
 
 @Composable
 fun SpendlessNavDisplay() {
@@ -23,17 +24,38 @@ fun SpendlessNavDisplay() {
         entry<RegistrationDestination> {
             RegistrationScreen(
                     onNavigateToPin = navigator::navigateToPin,
+
+/*
+{username ->
+                        //navigator.navigateToPin(PinMode.Create(username))
+
+                    },
+*/
                     onNavigateToLogin = navigator::navigateToLogin
             )
         }
 
         entry<PinDestination> {
+
+/*
+            when(it.mode){
+
+                is PinMode.Create -> navigator.navigateToPin(it.mode.username)
+                PinMode.Unlock -> navigator.navigateToPin(null)
+            }
+*/
             PinScreen(
                     username = it.username,
+                    onNavigateBack = navigator::popBackstack,
+                    onNavigateToDashboard = navigator::navigateToDashboard,
                     onNavigateToLogin = navigator::navigateToLogin
             )
         }
         entry<LoginDestination> { }
+        entry<DashboardDestination> {
+
+            DashboardScreen()
+        }
 
     }
     NavDisplay(

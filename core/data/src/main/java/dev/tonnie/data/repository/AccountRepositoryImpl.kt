@@ -19,10 +19,10 @@ class AccountRepositoryImpl(private val accountDao: AccountDao) : AccountReposit
 
     override suspend fun createAccount(
         account: Account,
-        encryptedPin: String
+        pinHash: String
     ): Resource<Unit> {
         return safeIoCall {
-           val entity = account.toEntity(encryptedPin = encryptedPin)
+           val entity = account.toEntity(pinHash = pinHash)
             accountDao.insert(entity) }
     }
 }

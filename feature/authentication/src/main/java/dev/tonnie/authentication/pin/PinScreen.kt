@@ -1,7 +1,6 @@
 package dev.tonnie.authentication.pin
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.slideIn
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
@@ -23,6 +22,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Backspace
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -61,15 +61,18 @@ fun PinScreen(
     viewModel: PinViewModel = koinViewModel(
             parameters = { parametersOf(username) }
     ),
+    onNavigateBack: () -> Unit,
     onNavigateToLogin: () -> Unit,
+    onNavigateToDashboard: () -> Unit,
 ) {
 
     BaseContentLayout(
             viewModel = viewModel,
             actionEventHandler = { _, actionEvent ->
                 when (actionEvent) {
-                    is PinActionEvent.NavigateBack -> onNavigateToLogin()
-
+                    is PinActionEvent.NavigateBack -> onNavigateBack()
+                    is PinActionEvent.NavigateToDashboard -> onNavigateToDashboard()
+                    is PinActionEvent.NavigateToLogin -> onNavigateToLogin()
                 }
             }
     ) { state ->
@@ -91,6 +94,8 @@ private fun PinScreenContent(
             R.string.cds_text_pin_progress, pin.length, PIN_LENGTH
     )
     val spacing = MaterialTheme.spacing
+
+
 
     val (headerText, captionText) = when (uiState.pinStage) {
         PinStage.CREATE -> {
@@ -125,10 +130,11 @@ private fun PinScreenContent(
                             )
             ) {
                 IconButton(
-                        onClick = { onEvent(PinUiEvent.ExitPinScreen) },
                         modifier = Modifier
                                 .align(Alignment.TopStart)
                                 .padding(start = spacing.spaceSmall),
+                        onClick = { onEvent(PinUiEvent.ExitPinScreen) },
+                        enabled = !uiState.isCreatingAccount,
                 ) {
                     Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -202,9 +208,17 @@ private fun PinScreenContent(
                                 Spacer(keyModifier)
                             } else {
                                 val isDelete = digit == -1
+
+                                val isKeyEnabled = !uiState.isCreatingAccount &&
+                                        if (isDelete) {
+                                            pin.isNotEmpty()
+                                        } else {
+                                            pin.length < PIN_LENGTH
+                                        }
+
                                 Surface(
                                         modifier = keyModifier.semantics { role = Role.Button },
-                                        enabled = if (isDelete) pin.isNotEmpty() else pin.length < PIN_LENGTH,
+                                        enabled = isKeyEnabled,
                                         shape = RoundedCornerShape(32.dp),
                                         color = if (isDelete)
                                             MaterialTheme.colorScheme.primaryFixed.copy(alpha = 0.24f)
@@ -240,17 +254,35 @@ private fun PinScreenContent(
 
         AnimatedVisibility(
                 modifier = Modifier.align(Alignment.BottomCenter),
-                visible = uiState.pin.length == PIN_LENGTH,
+                visible = uiState.pinMismatchError || uiState.accountCreationError,
                 enter = slideInVertically { it },
                 exit = slideOutVertically { it }
-        ) { }
-        if (uiState.mismatchError) {
+        ) {
+
             AppErrorBanner(
                     modifier = Modifier.align(Alignment.BottomCenter),
-                    text = stringResource(R.string.banner_text_pin_mismatch)
+                    text = if (uiState.pinMismatchError) {
+                        stringResource(R.string.banner_text_pin_mismatch)
+                    } else {
+                        stringResource(R.string.banner_text_account_creation_error)
+                    }
             )
         }
+
+        AnimatedVisibility(visible = uiState.isCreatingAccount) {
+            Box(
+                    modifier = Modifier
+                            .fillMaxSize()
+                            .background(MaterialTheme.colorScheme.scrim.copy(alpha = .32f)),
+                    contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(
+                        color = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
     }
+
 }
 
 private val MAX_WIDTH = 400.dp

@@ -5,6 +5,7 @@ package dev.tonnie.authentication.registration
 import androidx.annotation.StringRes
 import androidx.compose.runtime.snapshotFlow
 import dev.tonnie.authentication.R
+import dev.tonnie.authentication.pin.handling.PinActionEvent
 import dev.tonnie.authentication.registration.handling.RegistrationActionEvent
 import dev.tonnie.authentication.registration.handling.RegistrationUiEvent
 import dev.tonnie.authentication.registration.handling.RegistrationUiState
@@ -45,41 +46,31 @@ class RegistrationViewModel(
                     .map { it.trim() }
                     .collect { username ->
 
-                        when(val result = validateUsernameUseCase(username)){
+                        when (val result = validateUsernameUseCase(username)) {
 
                             is Resource.Success -> {
                                 updateState { state ->
                                     state.copy(
                                             nextButtonEnabled = true,
                                             error = null,
-                                            usernameError = null
+                                            usernameInputError = null
                                     )
                                 }
 
-                        }
+                            }
 
                             is Resource.Error -> {
                                 updateState { state ->
                                     state.copy(
                                             nextButtonEnabled = false,
 
-                                            usernameError = result.error.toUsernameError(username)
+                                            usernameInputError = result.error.toUsernameError(username)
                                     )
                                 }
                             }
 
                         }
 
-                    /*    val isValid = when (validateUsernameUseCase.invoke(username)) {
-                            is Resource.Success -> true
-                            is Resource.Error -> false
-                        }
-                        updateState { state ->
-                            state.copy(
-                                    nextButtonEnabled = isValid,
-                                    error = null
-                            )
-                        }*/
                     }
         }
     }
@@ -113,16 +104,18 @@ class RegistrationViewModel(
                     when (result.error) {
 
                         is DataError.UsernameAlreadyExists -> {
+
                             updateState { state ->
                                 state.copy(
                                         isLoading = false,
                                         nextButtonEnabled = false,
-                                        error = R.string.banner_text_username_taken
+                                        error = R.string.banner_text_username_taken,
+                                        unavailableUsername = username
                                 )
                             }
                         }
-
                         else -> {
+
                             updateState {
                                 it.copy(
                                         isLoading = false,
@@ -132,7 +125,6 @@ class RegistrationViewModel(
                             }
                         }
                     }
-                    // Handle unexpected DB / IO error                  }
                 }
             }
         }

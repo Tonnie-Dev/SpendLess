@@ -5,7 +5,9 @@ import dev.tonnie.presentation.handling.UiState
 data class PinUiState(
     val pin: String = "",
     val pinStage: PinStage = PinStage.CREATE,
-    val mismatchError: Boolean = false
+    val isCreatingAccount: Boolean = false,
+    val pinMismatchError: Boolean = false,
+    val accountCreationError: Boolean = false
 ) : UiState
 
 enum class PinStage { CREATE, CONFIRM }
