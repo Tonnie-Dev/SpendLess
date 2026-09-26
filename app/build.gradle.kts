@@ -32,6 +32,7 @@ dependencies {
     //Modules
     implementation(project(":core:designsystem"))
     implementation(project(":core:database"))
+    implementation(project(":core:datastore"))
     implementation(project(":core:data"))
     implementation(project(":core:domain"))
     implementation(project(":feature:authentication"))

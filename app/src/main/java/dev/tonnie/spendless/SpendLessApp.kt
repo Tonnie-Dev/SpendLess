@@ -4,6 +4,7 @@ import android.app.Application
 import dev.tonnie.authentication.di.authenticationModule
 import dev.tonnie.data.di.dataModule
 import dev.tonnie.database.di.databaseModule
+import dev.tonnie.datastore.di.dataStoreModule
 import dev.tonnie.domain.di.domainModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -19,6 +20,7 @@ class SpendLessApp : Application(){
             modules(
                     databaseModule,
                     dataModule,
+                    dataStoreModule,
                     domainModule,
                     authenticationModule
             )
