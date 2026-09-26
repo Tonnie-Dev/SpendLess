@@ -42,6 +42,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import dev.tonnie.authentication.R
 import dev.tonnie.authentication.pin.handling.PinActionEvent
+import dev.tonnie.authentication.pin.handling.PinPurpose
 import dev.tonnie.authentication.pin.handling.PinStage
 import dev.tonnie.authentication.pin.handling.PinUiEvent
 import dev.tonnie.authentication.pin.handling.PinUiState
@@ -57,9 +58,9 @@ import org.koin.core.parameter.parametersOf
 
 @Composable
 fun PinScreen(
-    username: String?,
+    pinPurpose: PinPurpose,
     viewModel: PinViewModel = koinViewModel(
-            parameters = { parametersOf(username) }
+            parameters = { parametersOf(pinPurpose) }
     ),
     onNavigateBack: () -> Unit,
     onNavigateToLogin: () -> Unit,

@@ -8,6 +8,7 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import dev.tonnie.authentication.pin.PinScreen
+import dev.tonnie.authentication.pin.handling.PinPurpose
 import dev.tonnie.authentication.registration.RegistrationScreen
 import dev.tonnie.dashboard.DashboardScreen
 
@@ -16,36 +17,34 @@ fun SpendlessNavDisplay() {
 
     val backStack = rememberNavBackStack(RegistrationDestination)
 
-    val navigator = remember (backStack){
+    val navigator = remember(backStack) {
         Navigator(backStack = backStack)
     }
 
     val entryProvider = entryProvider {
         entry<RegistrationDestination> {
             RegistrationScreen(
-                    onNavigateToPin = navigator::navigateToPin,
-
-/*
-{username ->
-                        //navigator.navigateToPin(PinMode.Create(username))
-
+                    onNavigateToPin = {
+                        navigator.navigateToPin(mode = PinMode.Create(username = it))
                     },
-*/
                     onNavigateToLogin = navigator::navigateToLogin
             )
         }
 
-        entry<PinDestination> {
+        entry<PinDestination> { destination ->
 
-/*
-            when(it.mode){
+            val purpose = when (val mode = destination.mode) {
+                is PinMode.Create -> {
+                    PinPurpose.CreateAccount(mode.username)
+                }
 
-                is PinMode.Create -> navigator.navigateToPin(it.mode.username)
-                PinMode.Unlock -> navigator.navigateToPin(null)
+                PinMode.Unlock -> {
+                    PinPurpose.UnlockAccount
+                }
             }
-*/
+
             PinScreen(
-                    username = it.username,
+                    pinPurpose = purpose,
                     onNavigateBack = navigator::popBackstack,
                     onNavigateToDashboard = navigator::navigateToDashboard,
                     onNavigateToLogin = navigator::navigateToLogin
@@ -56,8 +55,8 @@ fun SpendlessNavDisplay() {
 
             DashboardScreen()
         }
-
     }
+
     NavDisplay(
             backStack = backStack,
             entryProvider = entryProvider,
@@ -66,5 +65,4 @@ fun SpendlessNavDisplay() {
                     rememberViewModelStoreNavEntryDecorator()
             )
     )
-
 }

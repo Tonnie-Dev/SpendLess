@@ -1,6 +1,7 @@
 package dev.tonnie.authentication.pin
 
 import dev.tonnie.authentication.pin.handling.PinActionEvent
+import dev.tonnie.authentication.pin.handling.PinPurpose
 import dev.tonnie.authentication.pin.handling.PinStage
 import dev.tonnie.authentication.pin.handling.PinUiEvent
 import dev.tonnie.authentication.pin.handling.PinUiState
@@ -12,7 +13,7 @@ import dev.tonnie.presentation.BaseViewModel
 typealias PinBaseViewModel = BaseViewModel<PinUiState, PinUiEvent, PinActionEvent>
 
 class PinViewModel(
-    private val username: String?,
+    val pinPurpose: PinPurpose,
     private val createAccountUseCase: CreateAccountUseCase
 ) : PinBaseViewModel(initialState = PinUiState()) {
 
@@ -83,11 +84,18 @@ class PinViewModel(
     }
 
     private fun onPinsMatch() {
-        createAccount()
+        when (pinPurpose) {
+            is PinPurpose.CreateAccount -> createAccount(pinPurpose.username)
+            is PinPurpose.UnlockAccount -> verifyPin()
+        }
     }
 
-    private fun createAccount() {
-        val username = this.username ?: return
+    private fun verifyPin() {
+        sendActionEvent(PinActionEvent.NavigateToDashboard)
+
+    }
+
+    private fun createAccount(username: String) {
         val pin = currentState.pin
 
         updateState { state ->
@@ -106,8 +114,9 @@ class PinViewModel(
                 is Resource.Error -> {
                     updateState { state ->
                         state.copy(
-                               isCreatingAccount = false,
-                                accountCreationError = true)
+                                isCreatingAccount = false,
+                                accountCreationError = true
+                        )
                     }
                 }
             }
@@ -115,12 +124,10 @@ class PinViewModel(
     }
 
     private fun exitPinScreen() {
-
-            if (username != null) {
-                sendActionEvent(PinActionEvent.NavigateBack)
-            } else {
-                sendActionEvent(PinActionEvent.NavigateToLogin)
-            }
+        when (pinPurpose) {
+            is PinPurpose.CreateAccount -> sendActionEvent(PinActionEvent.NavigateBack)
+            is PinPurpose.UnlockAccount -> sendActionEvent(PinActionEvent.NavigateToLogin)
         }
+    }
 
 }

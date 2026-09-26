@@ -4,7 +4,7 @@ import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 
 class Navigator(private val backStack: NavBackStack<NavKey>) {
-    private fun push(destination: NavKey){
+    private fun push(destination: NavKey) {
         backStack.add(destination)
     }
 
@@ -14,25 +14,16 @@ class Navigator(private val backStack: NavBackStack<NavKey>) {
         backStack.add(destination)
     }
 
-    fun navigateToRegistration(){
+    fun navigateToPin(mode: PinMode) {
+        push(PinDestination(mode))
+    }
 
-        push(RegistrationDestination)
-    }
-    fun navigateToPin(username: String? = null){
-        push(PinDestination(username))
-    }
-/*
-    fun navigateToPin(pinMode: PinMode){
-        push(PinDestination(pinMode))
-    }
-*/
-
-    fun navigateToLogin(){
+    fun navigateToLogin() {
 
         clearAndReplace(LoginDestination)
     }
 
-    fun navigateToDashboard(){
+    fun navigateToDashboard() {
         push(DashboardDestination)
     }
 

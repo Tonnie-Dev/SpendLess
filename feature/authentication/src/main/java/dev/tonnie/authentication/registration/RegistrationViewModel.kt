@@ -93,7 +93,7 @@ class RegistrationViewModel(
             when (val result = isUsernameAvailableUseCase(username)) {
                 is Resource.Success -> {
                     updateState {
-                        it.copy(isLoading = false)
+                        it.copy(isLoading = false, nextButtonEnabled = true)
                     }
 
                     sendActionEvent(RegistrationActionEvent.NavigateToCreatePin(username))
