@@ -7,6 +7,7 @@ import dev.tonnie.authentication.pin.handling.PinUiEvent
 import dev.tonnie.authentication.pin.handling.PinUiState
 import dev.tonnie.domain.constants.AccountConstants.PIN_LENGTH
 import dev.tonnie.domain.usecase.account.CreateAccountUseCase
+import dev.tonnie.domain.usecase.account.VerifyPinUseCase
 import dev.tonnie.exceptions.Resource
 import dev.tonnie.presentation.BaseViewModel
 
@@ -14,7 +15,8 @@ typealias PinBaseViewModel = BaseViewModel<PinUiState, PinUiEvent, PinActionEven
 
 class PinViewModel(
     val pinPurpose: PinPurpose,
-    private val createAccountUseCase: CreateAccountUseCase
+    private val createAccountUseCase: CreateAccountUseCase,
+    private val verifyPinUseCase: VerifyPinUseCase
 ) : PinBaseViewModel(initialState = PinUiState()) {
 
     private var createdPin: String? = null
@@ -36,7 +38,14 @@ class PinViewModel(
 
         val updatedPin = currentState.pin + digit
 
-        updateState { state -> state.copy(pin = updatedPin, pinMismatchError = false) }
+        updateState { state ->
+            state.copy(
+                    pin = updatedPin,
+                    pinErrorState = state.pinErrorState.copy(
+                            pinMismatchError = false
+                    )
+            )
+        }
 
         if (updatedPin.length == PIN_LENGTH) {
             onPinCompleted()
@@ -53,7 +62,7 @@ class PinViewModel(
             state.copy(
                     pin = "",
                     pinStage = PinStage.CONFIRM,
-                    pinMismatchError = false
+                    pinErrorState = state.pinErrorState.copy(pinMismatchError = false)
             )
         }
     }
@@ -78,7 +87,7 @@ class PinViewModel(
         updateState { state ->
             state.copy(
                     pin = "",
-                    pinMismatchError = true
+                    pinErrorState = state.pinErrorState.copy(pinMismatchError = true)
             )
         }
     }
@@ -91,8 +100,21 @@ class PinViewModel(
     }
 
     private fun verifyPin() {
-        sendActionEvent(PinActionEvent.NavigateToDashboard)
 
+        launch {
+            when (val result = verifyPinUseCase(currentState.pin)) {
+                is Resource.Success -> {
+                    if (result.data) {
+                        sendActionEvent(PinActionEvent.NavigateToDashboard)
+                    } else {
+                        onInvalidPin()
+                    }
+                }
+
+                is Resource.Error -> onPinVerificationError()
+            }
+        }
+        sendActionEvent(PinActionEvent.NavigateToDashboard)
     }
 
     private fun createAccount(username: String) {
@@ -100,8 +122,7 @@ class PinViewModel(
 
         updateState { state ->
             state.copy(
-                    isCreatingAccount = true,
-                    accountCreationError = false
+                    isCreatingAccount = true
             )
         }
 
@@ -115,11 +136,35 @@ class PinViewModel(
                     updateState { state ->
                         state.copy(
                                 isCreatingAccount = false,
-                                accountCreationError = true
+                                pinErrorState = state.pinErrorState.copy(
+                                        accountCreationError = true
+                                )
                         )
                     }
                 }
             }
+        }
+    }
+
+    private fun onInvalidPin() {
+        updateState { state ->
+            state.copy(
+                    pin = "",
+                    pinErrorState = state.pinErrorState.copy(
+                            invalidPinError = true
+                    )
+            )
+        }
+    }
+
+    private fun onPinVerificationError() {
+        updateState { state ->
+            state.copy(
+                    pin = "",
+                    pinErrorState = state.pinErrorState.copy(
+                            pinVerificationError = true
+                    )
+            )
         }
     }
 
@@ -129,5 +174,4 @@ class PinViewModel(
             is PinPurpose.UnlockAccount -> sendActionEvent(PinActionEvent.NavigateToLogin)
         }
     }
-
 }

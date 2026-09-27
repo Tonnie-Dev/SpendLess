@@ -20,4 +20,7 @@ interface AccountDao: BaseDao<AccountEntity>{
 
     @Query("SELECT * FROM accounts WHERE username = :username LIMIT 1")
     suspend fun getAccount(username: String): AccountEntity?
+
+    @Query("SELECT pin_hash FROM accounts WHERE username = :username LIMIT 1")
+    suspend fun getPinHash(username: String): String?
 }

@@ -9,5 +9,6 @@ android {
 
 dependencies {
     implementation(libs.androidx.datastore.preferences)
+    implementation(project(":core:repository"))
 
 }

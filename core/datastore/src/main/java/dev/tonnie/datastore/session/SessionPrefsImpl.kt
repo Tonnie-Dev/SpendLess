@@ -7,13 +7,14 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import dev.tonnie.repository.SessionPrefs
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 
-internal class SessionPrefsImpl(private val dataStore: DataStore<Preferences>) : SessionPrefs, {
+internal class SessionPrefsImpl(private val dataStore: DataStore<Preferences>) : SessionPrefs {
 
-    override val safeData: Flow<Preferences> = dataStore.data
+     val safeData: Flow<Preferences> = dataStore.data
             .catch { e ->
                 if (e is IOException) {
                     emit(emptyPreferences())

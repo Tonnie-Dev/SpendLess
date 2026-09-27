@@ -95,6 +95,5 @@ class Pbkdf2PinHasher : PinHasher {
         val secureRandom = SecureRandom()
 
     }
-
 }
 

@@ -96,7 +96,13 @@ private fun PinScreenContent(
     )
     val spacing = MaterialTheme.spacing
 
+    val pinErrorState = uiState.pinErrorState
 
+    val showErrorBanner = pinErrorState.pinMismatchError ||
+            pinErrorState.invalidPinError ||
+            pinErrorState.accountCreationError
+
+    val showSpinner = uiState.isCreatingAccount
 
     val (headerText, captionText) = when (uiState.pinStage) {
         PinStage.CREATE -> {
@@ -255,22 +261,22 @@ private fun PinScreenContent(
 
         AnimatedVisibility(
                 modifier = Modifier.align(Alignment.BottomCenter),
-                visible = uiState.pinMismatchError || uiState.accountCreationError,
+                visible = showErrorBanner,
                 enter = slideInVertically { it },
                 exit = slideOutVertically { it }
         ) {
 
             AppErrorBanner(
                     modifier = Modifier.align(Alignment.BottomCenter),
-                    text = if (uiState.pinMismatchError) {
-                        stringResource(R.string.banner_text_pin_mismatch)
-                    } else {
-                        stringResource(R.string.banner_text_account_creation_error)
+                    text = when {
+                        pinErrorState.pinMismatchError -> stringResource(R.string.banner_text_pin_mismatch)
+                        pinErrorState.invalidPinError -> stringResource(R.string.banner_text_invalid_pin)
+                        else -> stringResource(R.string.banner_text_account_creation_error)
                     }
             )
         }
 
-        AnimatedVisibility(visible = uiState.isCreatingAccount) {
+        AnimatedVisibility(visible = showSpinner) {
             Box(
                     modifier = Modifier
                             .fillMaxSize()

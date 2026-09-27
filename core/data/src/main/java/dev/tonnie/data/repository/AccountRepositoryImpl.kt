@@ -20,15 +20,6 @@ class AccountRepositoryImpl(private val accountDao: AccountDao) : AccountReposit
         }
     }
 
-    suspend fun readPinHash(username: String): Resource<String?> {
-
-        return safeIoCall {
-
-            val accountEntity = accountDao.getAccount(username)
-            accountEntity?.pinHash
-        }
-    }
-
     override suspend fun createAccount(
         account: Account,
         pinHash: String
@@ -36,6 +27,12 @@ class AccountRepositoryImpl(private val accountDao: AccountDao) : AccountReposit
         return safeIoCall {
             val entity = account.toEntity(pinHash = pinHash)
             accountDao.insert(entity)
+        }
+    }
+
+    override suspend fun getPinHash(username: String): Resource<String?> {
+        return safeIoCall {
+            accountDao.getPinHash(username)
         }
     }
 }
