@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicSecureTextField
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.text.input.TextFieldDecorator
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.MaterialTheme
@@ -52,15 +51,16 @@ fun AppInputField(
     isPassword: Boolean = false,
     @StringRes
     errorMessageRes: Int? = null,
-    ) {
+) {
     val isError = errorMessageRes != null
     var isFocused by remember { mutableStateOf(false) }
 
     val isTextFieldEmpty = state.text.isEmpty()
 
     val spacing = MaterialTheme.spacing
-
+    Column(verticalArrangement = Arrangement.spacedBy(space = spacing.spaceDoubleDp)) {
     if (isPassword) {
+
         BasicSecureTextField(
                 state = state,
                 modifier = modifier
@@ -78,6 +78,7 @@ fun AppInputField(
                     TextFieldDecorator(
                             innerTextField = innerTextField,
                             isFocused = isFocused,
+                            isError = isError,
                             isTextFieldEmpty = isTextFieldEmpty,
                             showFocusBorder = showFocusBorder,
                             placeholder = placeholder,
@@ -87,10 +88,10 @@ fun AppInputField(
                     )
                 },
         )
-        return
-    }
 
-    Column(verticalArrangement = Arrangement.spacedBy(space = spacing.spaceDoubleDp)) {
+    }else
+
+
         BasicTextField(
                 modifier = modifier
                         .fillMaxWidth()
@@ -105,6 +106,7 @@ fun AppInputField(
                 decorator = { innerTextField ->
                     TextFieldDecorator(
                             isFocused = isFocused,
+                            isError = isError,
                             innerTextField = innerTextField,
                             placeholder = placeholder,
                             isTextFieldEmpty = isTextFieldEmpty,
@@ -117,19 +119,17 @@ fun AppInputField(
                 keyboardOptions = KeyboardOptions(keyboardType = keyboardType)
         )
 
-
-            if (errorMessageRes != null) {
-                Text(
-                        text = stringResource(errorMessageRes),
-                        modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.error,
-                        textAlign = TextAlign.Start
-                )
-            }
-
+        if (errorMessageRes != null) {
+            Text(
+                    text = stringResource(errorMessageRes),
+                    modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error,
+                    textAlign = TextAlign.Start
+            )
+        }
 
     }
 }
@@ -138,6 +138,7 @@ fun AppInputField(
 private fun TextFieldDecorator(
     innerTextField: @Composable () -> Unit,
     isFocused: Boolean,
+    isError: Boolean,
     showFocusBorder: Boolean,
     placeholder: String,
     isTextFieldEmpty: Boolean,
@@ -158,7 +159,10 @@ private fun TextFieldDecorator(
                             if (showFocusBorder && isFocused) {
                                 Modifier.border(
                                         width = MaterialTheme.spacing.spaceSingleDp,
-                                        color = MaterialTheme.colorScheme.primary,
+                                        color = if (isError)
+                                            MaterialTheme.colorScheme.error
+                                        else
+                                            MaterialTheme.colorScheme.primary,
                                         shape = MaterialTheme.shapes.large
                                 )
                             } else {
