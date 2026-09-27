@@ -8,6 +8,10 @@ sealed interface DataError {
 
     data object InvalidUsernameLength : DataError
 
+    data object InvalidPinFormat : DataError
+
+    data object InvalidPinLength : DataError
+
     data object AccountNotFound : DataError
 
     data object DatabaseError : DataError

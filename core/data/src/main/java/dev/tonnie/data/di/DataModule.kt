@@ -13,7 +13,10 @@ import org.koin.dsl.module
 val dataModule = module {
 
     single<AccountRepository> { AccountRepositoryImpl(accountDao = get()) }
+
     single<PinHasher> { Pbkdf2PinHasher() }
+
     single<Clock> { SystemClock() }
+
     single<SessionRepository> { SessionRepositoryImpl(sessionPrefs = get(), clock = get()) }
 }
