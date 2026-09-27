@@ -53,7 +53,10 @@
     </string>
     <string name="supporting_text_username_error_length">
     Username cannot exceed 14 characters
-</string>
+    </string>
+    <string name="supporting_text_error_pin_length">PIN must be 5 digits</string>
+    <string name="supporting_text_error_pin_format">PIN must contain digits only</string>
+
     <!--Label Texts-->
     <string name="label_text_title">Title</string>
 

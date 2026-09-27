@@ -8,12 +8,12 @@ class ValidatePinUseCase {
 
     operator fun invoke(pin: String): Resource<Boolean> {
 
-        return if (pin.length != PIN_LENGTH) {
-            Resource.Error(DataError.InvalidPinLength)
-        } else if (pin.any { !it.isDigit() }) {
+        return if (pin.any { !it.isDigit() }) {
             Resource.Error(DataError.InvalidPinFormat)
+        } else if (pin.length != PIN_LENGTH) {
+            Resource.Error(DataError.InvalidPinLength)
         } else {
-            Resource.Success(true)
+            Resource.Success(data = true)
         }
     }
 }
