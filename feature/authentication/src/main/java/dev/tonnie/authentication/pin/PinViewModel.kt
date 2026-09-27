@@ -10,6 +10,7 @@ import dev.tonnie.domain.usecase.account.CreateAccountUseCase
 import dev.tonnie.domain.usecase.account.VerifyPinUseCase
 import dev.tonnie.exceptions.Resource
 import dev.tonnie.presentation.BaseViewModel
+import dev.tonnie.repository.SessionRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.milliseconds
@@ -19,7 +20,8 @@ typealias PinBaseViewModel = BaseViewModel<PinUiState, PinUiEvent, PinActionEven
 class PinViewModel(
     val pinPurpose: PinPurpose,
     private val createAccountUseCase: CreateAccountUseCase,
-    private val verifyPinUseCase: VerifyPinUseCase
+    private val verifyPinUseCase: VerifyPinUseCase,
+    private val sessionRepository: SessionRepository
 ) : PinBaseViewModel(initialState = PinUiState()) {
 
     private var createdPin: String? = null
@@ -111,6 +113,7 @@ class PinViewModel(
             when (val result = verifyPinUseCase(currentState.pin)) {
                 is Resource.Success -> {
                     if (result.data) {
+                        sessionRepository.refreshSession()
                         sendActionEvent(PinActionEvent.NavigateToDashboard)
                     } else {
                         onInvalidPin()
@@ -120,7 +123,6 @@ class PinViewModel(
                 is Resource.Error -> onPinVerificationError()
             }
         }
-        
     }
 
     private fun createAccount(username: String) {
@@ -135,6 +137,7 @@ class PinViewModel(
         launch {
             when (createAccountUseCase(username, pin)) {
                 is Resource.Success -> {
+                    sessionRepository.startSession(username)
                     sendActionEvent(PinActionEvent.NavigateToDashboard)
                 }
 
