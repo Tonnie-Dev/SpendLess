@@ -271,7 +271,8 @@ private fun PinScreenContent(
                     text = when {
                         pinErrorState.pinMismatchError -> stringResource(R.string.banner_text_pin_mismatch)
                         pinErrorState.invalidPinError -> stringResource(R.string.banner_text_invalid_pin)
-                        else -> stringResource(R.string.banner_text_account_creation_error)
+                        pinErrorState.accountCreationError -> stringResource(R.string.banner_text_account_creation_error)
+                        else -> stringResource(R.string.banner_text_generic_error)
                     }
             )
         }

@@ -10,6 +10,9 @@ import dev.tonnie.domain.usecase.account.CreateAccountUseCase
 import dev.tonnie.domain.usecase.account.VerifyPinUseCase
 import dev.tonnie.exceptions.Resource
 import dev.tonnie.presentation.BaseViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlin.time.Duration.Companion.milliseconds
 
 typealias PinBaseViewModel = BaseViewModel<PinUiState, PinUiEvent, PinActionEvent>
 
@@ -20,6 +23,7 @@ class PinViewModel(
 ) : PinBaseViewModel(initialState = PinUiState()) {
 
     private var createdPin: String? = null
+    private var dismissBannerJob: Job? = null
 
     override fun onEvent(event: PinUiEvent) {
         when (event) {
@@ -90,6 +94,8 @@ class PinViewModel(
                     pinErrorState = state.pinErrorState.copy(pinMismatchError = true)
             )
         }
+
+        scheduleBannerDismissal()
     }
 
     private fun onPinsMatch() {
@@ -114,7 +120,7 @@ class PinViewModel(
                 is Resource.Error -> onPinVerificationError()
             }
         }
-        sendActionEvent(PinActionEvent.NavigateToDashboard)
+        
     }
 
     private fun createAccount(username: String) {
@@ -141,6 +147,8 @@ class PinViewModel(
                                 )
                         )
                     }
+
+                    scheduleBannerDismissal()
                 }
             }
         }
@@ -155,6 +163,7 @@ class PinViewModel(
                     )
             )
         }
+        scheduleBannerDismissal()
     }
 
     private fun onPinVerificationError() {
@@ -165,6 +174,26 @@ class PinViewModel(
                             pinVerificationError = true
                     )
             )
+        }
+
+        scheduleBannerDismissal()
+    }
+
+    private fun scheduleBannerDismissal() {
+        dismissBannerJob?.cancel()
+        dismissBannerJob = launch {
+            delay(2_000.milliseconds)
+
+            updateState { state ->
+                state.copy(
+                        pinErrorState = state.pinErrorState.copy(
+                                pinMismatchError = false,
+                                invalidPinError = false,
+                                pinVerificationError = false,
+                                accountCreationError = false
+                        )
+                )
+            }
         }
     }
 

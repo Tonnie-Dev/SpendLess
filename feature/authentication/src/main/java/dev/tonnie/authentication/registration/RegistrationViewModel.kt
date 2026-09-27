@@ -5,7 +5,6 @@ package dev.tonnie.authentication.registration
 import androidx.annotation.StringRes
 import androidx.compose.runtime.snapshotFlow
 import dev.tonnie.authentication.R
-import dev.tonnie.authentication.pin.handling.PinActionEvent
 import dev.tonnie.authentication.registration.handling.RegistrationActionEvent
 import dev.tonnie.authentication.registration.handling.RegistrationUiEvent
 import dev.tonnie.authentication.registration.handling.RegistrationUiState
@@ -15,7 +14,10 @@ import dev.tonnie.exceptions.DataError
 import dev.tonnie.exceptions.Resource
 import dev.tonnie.presentation.BaseViewModel
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.map
+import kotlin.time.Duration.Companion.milliseconds
 
 typealias RegistrationBaseViewModel = BaseViewModel<RegistrationUiState, RegistrationUiEvent, RegistrationActionEvent>
 
@@ -23,6 +25,8 @@ class RegistrationViewModel(
     private val isUsernameAvailableUseCase: IsUsernameAvailableUseCase,
     private val validateUsernameUseCase: ValidateUsernameUseCase
 ) : RegistrationBaseViewModel(initialState = RegistrationUiState()) {
+
+    private var bannerDismissJob: Job? = null
 
     init {
         observeUsernameInput()
@@ -56,7 +60,6 @@ class RegistrationViewModel(
                                             usernameInputError = null
                                     )
                                 }
-
                             }
 
                             is Resource.Error -> {
@@ -64,7 +67,9 @@ class RegistrationViewModel(
                                     state.copy(
                                             nextButtonEnabled = false,
 
-                                            usernameInputError = result.error.toUsernameError(username)
+                                            usernameInputError = result.error.toUsernameError(
+                                                    username
+                                            )
                                     )
                                 }
                             }
@@ -113,7 +118,10 @@ class RegistrationViewModel(
                                         unavailableUsername = username
                                 )
                             }
+
+                            scheduleBannerDismissal()
                         }
+
                         else -> {
 
                             updateState {
@@ -123,9 +131,26 @@ class RegistrationViewModel(
                                         error = R.string.banner_text_generic_error
                                 )
                             }
+
+                            scheduleBannerDismissal()
                         }
                     }
                 }
+            }
+        }
+    }
+
+    private fun scheduleBannerDismissal() {
+        bannerDismissJob?.cancel()
+
+        bannerDismissJob = launch {
+
+            delay(2_000.milliseconds)
+            updateState { state ->
+                state.copy(
+                        error = null,
+                        unavailableUsername = null
+                )
             }
         }
     }
