@@ -9,8 +9,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -24,34 +22,59 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import dev.tonnie.authentication.R
+import dev.tonnie.authentication.login.handling.LoginUiEvent
+import dev.tonnie.authentication.login.handling.LoginUiState
 import dev.tonnie.designsystem.components.AppButton
 import dev.tonnie.designsystem.components.AppInputField
 import dev.tonnie.designsystem.icon.AppIcon
 import dev.tonnie.designsystem.theme.SpendLessTheme
 import dev.tonnie.designsystem.theme.spacing
-import dev.tonnie.authentication.R
+import dev.tonnie.presentation.BaseContentLayout
+import org.koin.androidx.compose.koinViewModel
 
-/** Apply system-bar insets through [modifier], as with the other onboarding screens. */
 @Composable
 fun LoginScreen(
-    usernameState: TextFieldState,
-    pinState: TextFieldState,
-    onLoginClick: (username: String, pin: String) -> Unit,
-    onSignUpClick: () -> Unit,
+    onNavigateToDashboard: () -> Unit,
+    onNavigateToRegistration: () -> Unit,
+    viewModel: LoginViewModel = koinViewModel()
+) {
+
+    BaseContentLayout(viewModel = viewModel) {
+
+        uiState ->
+
+        LoginScreenContent(
+                uiState = uiState,
+                onEvent = viewModel::onEvent
+        )
+    }
+}
+
+@Composable
+private fun LoginScreenContent(
+    uiState: LoginUiState,
+    onEvent: (LoginUiEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val spacing = MaterialTheme.spacing
+
+    val usernamePlaceholderText = stringResource(R.string.placeholder_text_username)
+            .replaceFirstChar(Char::uppercaseChar)
+
     Column(
             modifier = modifier
                     .fillMaxSize()
                     .background(MaterialTheme.colorScheme.background)
                     .imePadding()
                     .verticalScroll(rememberScrollState())
-                    .padding(horizontal = spacing.spaceMedium),
+                    .padding(horizontal = spacing.spaceMedium)
+                    .padding(top = spacing.spaceLargeMedium),
             horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        AppIcon()
-        Spacer(Modifier.height(20.dp))
+
+        AppIcon(modifier = Modifier.padding(bottom = spacing.spaceMedium))
+
         Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(spacing.spaceSmall)
@@ -70,23 +93,27 @@ fun LoginScreen(
                     textAlign = TextAlign.Center,
             )
         }
+
         Spacer(Modifier.height(36.dp))
+
         Column(
                 modifier = Modifier.padding(bottom = MaterialTheme.spacing.spaceTwelve * 2),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(spacing.spaceMedium)
         ) {
+
             AppInputField(
-                    state = usernameState,
-                    placeholder = stringResource(R.string.placeholder_text_username),
+                    state = uiState.usernameTextFieldState,
+                    placeholder = usernamePlaceholderText,
                     modifier = Modifier.shadow(4.dp, MaterialTheme.shapes.large),
                     textStyle = MaterialTheme.typography.bodyMedium,
                     backgroundColor = MaterialTheme.colorScheme.surfaceContainerLowest,
                     showFocusBorder = true,
+                    errorMessageRes = uiState.usernameErrorRes
             )
 
             AppInputField(
-                    state = pinState,
+                    state = uiState.pinTextFieldState,
                     placeholder = stringResource(R.string.placeholder_text_pin),
                     modifier = Modifier.shadow(4.dp, MaterialTheme.shapes.large),
                     textStyle = MaterialTheme.typography.bodyMedium,
@@ -94,21 +121,20 @@ fun LoginScreen(
                     showFocusBorder = true,
                     keyboardType = KeyboardType.NumberPassword,
                     isPassword = true,
+                    errorMessageRes = uiState.pinErrorRes
             )
         }
 
-            AppButton(
-                    modifier = Modifier.padding(bottom = spacing.spaceLarge),
-                    buttonText = stringResource(R.string.button_text_login),
-                    onClick = {
-                        onLoginClick(
-                                usernameState.text.toString()
-                                        .trim(), pinState.text.toString()
-                        )
-                    },
-            )
+        AppButton(
+                modifier = Modifier.padding(bottom = spacing.spaceLarge),
+                buttonText = stringResource(R.string.button_text_login),
+                enabled = uiState.loginButtonEnabled,
+                onClick = { onEvent(LoginUiEvent.Login) },
+        )
 
-        TextButton(onClick = onSignUpClick) {
+        TextButton(
+                onClick = { onEvent(LoginUiEvent.Register) }
+        ) {
             Text(
                     text = stringResource(R.string.text_button_new_user),
                     style = MaterialTheme.typography.titleMedium,
@@ -119,13 +145,12 @@ fun LoginScreen(
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-private fun LoginScreenPreview() {
+private fun LoginScreenContentPreview() {
     SpendLessTheme {
-        LoginScreen(
-                usernameState = rememberTextFieldState(),
-                pinState = rememberTextFieldState(),
-                onLoginClick = { _, _ -> },
-                onSignUpClick = {},
+        LoginScreenContent(
+                modifier = Modifier,
+                uiState = LoginUiState(),
+                onEvent = {}
         )
     }
 }

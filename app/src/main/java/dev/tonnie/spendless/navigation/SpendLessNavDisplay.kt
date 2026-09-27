@@ -7,6 +7,7 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import dev.tonnie.authentication.login.LoginScreen
 import dev.tonnie.authentication.pin.PinScreen
 import dev.tonnie.authentication.pin.handling.PinPurpose
 import dev.tonnie.authentication.registration.RegistrationScreen
@@ -50,7 +51,13 @@ fun SpendlessNavDisplay() {
                     onNavigateToLogin = navigator::navigateToLogin
             )
         }
-        entry<LoginDestination> { }
+        entry<LoginDestination> {
+
+            LoginScreen(
+                    onNavigateToDashboard = navigator::navigateToDashboard,
+                    onNavigateToRegistration = navigator::navigateToRegistration
+            )
+        }
         entry<DashboardDestination> {
 
             DashboardScreen()

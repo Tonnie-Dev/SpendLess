@@ -2,12 +2,12 @@
 
 package dev.tonnie.authentication.registration
 
-import androidx.annotation.StringRes
 import androidx.compose.runtime.snapshotFlow
 import dev.tonnie.authentication.R
 import dev.tonnie.authentication.registration.handling.RegistrationActionEvent
 import dev.tonnie.authentication.registration.handling.RegistrationUiEvent
 import dev.tonnie.authentication.registration.handling.RegistrationUiState
+import dev.tonnie.authentication.utils.toErrorMessage
 import dev.tonnie.domain.usecase.account.IsUsernameAvailableUseCase
 import dev.tonnie.domain.usecase.account.ValidateUsernameUseCase
 import dev.tonnie.exceptions.DataError
@@ -16,7 +16,6 @@ import dev.tonnie.presentation.BaseViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.map
 import kotlin.time.Duration.Companion.milliseconds
 
 typealias RegistrationBaseViewModel = BaseViewModel<RegistrationUiState, RegistrationUiEvent, RegistrationActionEvent>
@@ -47,7 +46,7 @@ class RegistrationViewModel(
     private fun observeUsernameInput() {
         launch {
             snapshotFlow { currentState.usernameTextFieldState.text.toString() }
-                    .map { it.trim() }
+                   // .map { it.trim() }
                     .collect { username ->
 
                         when (val result = validateUsernameUseCase(username)) {
@@ -67,7 +66,7 @@ class RegistrationViewModel(
                                     state.copy(
                                             nextButtonEnabled = false,
 
-                                            usernameInputError = result.error.toUsernameError(
+                                            usernameInputError = result.error.toErrorMessage(
                                                     username
                                             )
                                     )
@@ -157,24 +156,5 @@ class RegistrationViewModel(
 
     private fun onSignInClicked() {
         sendActionEvent(RegistrationActionEvent.NavigateToLogin)
-    }
-}
-
-@StringRes
-private fun DataError.toUsernameError(username: String): Int? {
-    return when (this) {
-        DataError.InvalidUsernameLength -> {
-            if (username.length > 14) {
-                R.string.supporting_text_username_error_length
-            } else {
-                null
-            }
-        }
-
-        DataError.InvalidUsernameFormat -> {
-            R.string.supporting_text_username_error_format
-        }
-
-        else -> null
     }
 }
