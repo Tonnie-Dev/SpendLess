@@ -142,9 +142,7 @@ class LoginViewModel(
 
         launchCatching(
                 context = Dispatchers.IO,
-                onError = { onUnknownError() },
-                onStart = {},
-                onCompletion = {}
+                onError = { onUnknownError() }
         ) {
 
             when (val result = verifyPinUseCase(username, pin)) {
@@ -152,6 +150,7 @@ class LoginViewModel(
                 is Resource.Success -> {
                     if (result.data) {
                         sessionRepository.startSession(username)
+                        clearLoginFields()
                         sendActionEvent(LoginActionEvent.NavigateToDashboard)
                     } else {
                         onInvalidCredentialsError()
@@ -247,5 +246,15 @@ class LoginViewModel(
 
     private fun onRegister() {
         sendActionEvent(LoginActionEvent.NavigateToRegistration)
+    }
+
+    private fun clearLoginFields() {
+        currentState.usernameTextFieldState.edit {
+            replace(0, length, "")
+        }
+
+        currentState.pinTextFieldState.edit {
+            replace(0, length, "")
+        }
     }
 }

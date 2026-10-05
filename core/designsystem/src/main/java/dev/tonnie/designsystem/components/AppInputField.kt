@@ -6,6 +6,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -13,7 +14,13 @@ import androidx.compose.foundation.text.BasicSecureTextField
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.TextObfuscationMode
 import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,6 +40,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import dev.tonnie.designsystem.R
 import dev.tonnie.designsystem.theme.OnBackgroundStateLayer08
 import dev.tonnie.designsystem.theme.SpendLessTheme
 import dev.tonnie.designsystem.theme.spacing
@@ -56,68 +64,85 @@ fun AppInputField(
     var isFocused by remember { mutableStateOf(false) }
 
     val isTextFieldEmpty = state.text.isEmpty()
-
+    var showPassword by remember { mutableStateOf(false) }
     val spacing = MaterialTheme.spacing
+
     Column(verticalArrangement = Arrangement.spacedBy(space = spacing.spaceDoubleDp)) {
-    if (isPassword) {
-
-        BasicSecureTextField(
-                state = state,
-                modifier = modifier
-                        .fillMaxWidth()
-                        .height(height)
-                        .onFocusChanged { isFocused = it.isFocused },
-                textStyle = textStyle.copy(
-                        color = MaterialTheme.colorScheme.onSurface,
-                        textAlign = textAlign,
-                ),
-                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-                keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
-                textObfuscationMode = androidx.compose.foundation.text.input.TextObfuscationMode.Hidden,
-                decorator = { innerTextField ->
-                    TextFieldDecorator(
-                            innerTextField = innerTextField,
-                            isFocused = isFocused,
-                            isError = isError,
-                            isTextFieldEmpty = isTextFieldEmpty,
-                            showFocusBorder = showFocusBorder,
-                            placeholder = placeholder,
+        if (isPassword) {
+            BasicSecureTextField(
+                    state = state,
+                    modifier = modifier
+                            .fillMaxWidth()
+                            .height(height)
+                            .onFocusChanged { isFocused = it.isFocused },
+                    textStyle = textStyle.copy(
+                            color = MaterialTheme.colorScheme.onSurface,
                             textAlign = textAlign,
-                            textStyle = textStyle,
-                            backgroundColor = backgroundColor,
-                    )
-                },
-        )
-
-    }else
-
-
-        BasicTextField(
-                modifier = modifier
-                        .fillMaxWidth()
-                        .height(height)
-                        .onFocusChanged { isFocused = it.isFocused },
-                state = state,
-                textStyle = textStyle.copy(
-                        color = if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface,
-                        textAlign = textAlign
-                ),
-                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-                decorator = { innerTextField ->
-                    TextFieldDecorator(
-                            isFocused = isFocused,
-                            isError = isError,
-                            innerTextField = innerTextField,
-                            placeholder = placeholder,
-                            isTextFieldEmpty = isTextFieldEmpty,
-                            showFocusBorder = showFocusBorder,
-                            textAlign = textAlign,
-                            textStyle = textStyle,
-                            backgroundColor = backgroundColor,
-                    )
-                },
-                keyboardOptions = KeyboardOptions(keyboardType = keyboardType)
-        )
+                    ),
+                    cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                    keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+                    textObfuscationMode = if (showPassword)
+                        TextObfuscationMode.Visible
+                    else
+                        TextObfuscationMode.Hidden,
+                    decorator = { innerTextField ->
+                        TextFieldDecorator(
+                                innerTextField = innerTextField,
+                                isFocused = isFocused,
+                                isError = isError,
+                                isTextFieldEmpty = isTextFieldEmpty,
+                                showFocusBorder = showFocusBorder,
+                                placeholder = placeholder,
+                                textAlign = textAlign,
+                                textStyle = textStyle,
+                                backgroundColor = backgroundColor,
+                                trailingIcon = {
+                                    IconButton(onClick = { showPassword = !showPassword }) {
+                                        val (icon, description) = if (showPassword)
+                                            Icons.Default.VisibilityOff to
+                                                    stringResource(id = R.string.cds_text_hide_pin)
+                                        else
+                                            Icons.Default.Visibility to
+                                                    stringResource(id = R.string.cds_text_show_pin)
+                                        Icon(
+                                                imageVector = icon,
+                                                contentDescription = description
+                                        )
+                                    }
+                                }
+                        )
+                    }
+            )
+        } else
+            BasicTextField(
+                    modifier = modifier
+                            .fillMaxWidth()
+                            .height(height)
+                            .onFocusChanged { isFocused = it.isFocused },
+                    state = state,
+                    textStyle = textStyle.copy(
+                            color = if (isError)
+                                MaterialTheme.colorScheme.error
+                            else
+                                MaterialTheme.colorScheme.onSurface,
+                            textAlign = textAlign
+                    ),
+                    cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                    decorator = { innerTextField ->
+                        TextFieldDecorator(
+                                isFocused = isFocused,
+                                isError = isError,
+                                innerTextField = innerTextField,
+                                placeholder = placeholder,
+                                isTextFieldEmpty = isTextFieldEmpty,
+                                showFocusBorder = showFocusBorder,
+                                textAlign = textAlign,
+                                textStyle = textStyle,
+                                backgroundColor = backgroundColor,
+                        )
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = keyboardType)
+            )
 
         if (errorMessageRes != null) {
             Text(
@@ -130,7 +155,6 @@ fun AppInputField(
                     textAlign = TextAlign.Start
             )
         }
-
     }
 }
 
@@ -145,9 +169,10 @@ private fun TextFieldDecorator(
     backgroundColor: Color,
     textAlign: TextAlign,
     textStyle: TextStyle,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    trailingIcon: (@Composable () -> Unit)? = null
 ) {
-    Box(
+    Row(
             modifier = modifier
                     .fillMaxWidth()
                     .background(
@@ -171,23 +196,29 @@ private fun TextFieldDecorator(
                     )
                     .padding(horizontal = MaterialTheme.spacing.spaceMedium)
                     .padding(vertical = MaterialTheme.spacing.spaceTwelve),
-            contentAlignment = when (textAlign) {
-
-                TextAlign.Center -> Alignment.Center
-                TextAlign.End -> Alignment.CenterEnd
-                else -> Alignment.CenterStart
-            }
     ) {
-        if (isTextFieldEmpty) {
-            Text(
-                    text = placeholder,
-                    style = textStyle.copy(
-                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
-                            textAlign = TextAlign.Start
-                    )
-            )
+        Box(
+                modifier = Modifier.weight(1f),
+                contentAlignment = when (textAlign) {
+                    TextAlign.Center -> Alignment.Center
+                    TextAlign.End -> Alignment.CenterEnd
+                    else -> Alignment.CenterStart
+                }
+        ) {
+            if (isTextFieldEmpty) {
+                Text(
+                        text = placeholder,
+                        style = textStyle.copy(
+                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(
+                                        alpha = 0.6f
+                                ),
+                                textAlign = TextAlign.Start
+                        )
+                )
+            }
+            innerTextField()
         }
-        innerTextField()
+        trailingIcon?.invoke()
     }
 }
 
@@ -200,7 +231,6 @@ private val HEIGHT_LARGE = 64.dp
 )
 @Composable
 private fun AppInputFieldPreview() {
-
     SpendLessTheme {
         Column(
                 modifier = Modifier

@@ -17,7 +17,6 @@ import dev.tonnie.presentation.BaseViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlin.time.Duration.Companion.milliseconds
 
 typealias RegistrationBaseViewModel = BaseViewModel<RegistrationUiState, RegistrationUiEvent, RegistrationActionEvent>
 
@@ -47,7 +46,7 @@ class RegistrationViewModel(
     private fun observeUsernameInput() {
         launch {
             snapshotFlow { currentState.usernameTextFieldState.text.toString() }
-                   // .map { it.trim() }
+                    // .map { it.trim() }
                     .collect { username ->
 
                         when (val result = validateUsernameUseCase(username)) {
@@ -100,9 +99,7 @@ class RegistrationViewModel(
                     updateState {
                         it.copy(isLoading = false, nextButtonEnabled = true)
                     }
-
                     sendActionEvent(RegistrationActionEvent.NavigateToCreatePin(username))
-
                 }
 
                 is Resource.Error -> {
@@ -118,12 +115,10 @@ class RegistrationViewModel(
                                         unavailableUsername = username
                                 )
                             }
-
                             scheduleBannerDismissal()
                         }
 
                         else -> {
-
                             updateState {
                                 it.copy(
                                         isLoading = false,
@@ -131,7 +126,6 @@ class RegistrationViewModel(
                                         error = R.string.banner_text_generic_error
                                 )
                             }
-
                             scheduleBannerDismissal()
                         }
                     }

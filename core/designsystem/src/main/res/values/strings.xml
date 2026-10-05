@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="cds_text_show_pin">Show PIN</string>
+    <string name="cds_text_hide_pin">Hide PIN</string>
+</resources>
