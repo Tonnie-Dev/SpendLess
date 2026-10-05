@@ -8,6 +8,7 @@ import dev.tonnie.authentication.registration.handling.RegistrationActionEvent
 import dev.tonnie.authentication.registration.handling.RegistrationUiEvent
 import dev.tonnie.authentication.registration.handling.RegistrationUiState
 import dev.tonnie.authentication.utils.toErrorMessage
+import dev.tonnie.domain.constants.AppDefaults
 import dev.tonnie.domain.usecase.account.IsUsernameAvailableUseCase
 import dev.tonnie.domain.usecase.account.ValidateUsernameUseCase
 import dev.tonnie.exceptions.DataError
@@ -144,7 +145,7 @@ class RegistrationViewModel(
 
         bannerDismissJob = launch {
 
-            delay(2_000.milliseconds)
+            delay(AppDefaults.BANNER_DURATION_LENGTH)
             updateState { state ->
                 state.copy(
                         error = null,

@@ -1,13 +1,18 @@
 package dev.tonnie.authentication.login
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
@@ -23,9 +28,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import dev.tonnie.authentication.R
+import dev.tonnie.authentication.login.handling.LoginActionEvent
 import dev.tonnie.authentication.login.handling.LoginUiEvent
 import dev.tonnie.authentication.login.handling.LoginUiState
 import dev.tonnie.designsystem.components.AppButton
+import dev.tonnie.designsystem.components.AppErrorBanner
 import dev.tonnie.designsystem.components.AppInputField
 import dev.tonnie.designsystem.icon.AppIcon
 import dev.tonnie.designsystem.theme.SpendLessTheme
@@ -40,10 +47,22 @@ fun LoginScreen(
     viewModel: LoginViewModel = koinViewModel()
 ) {
 
-    BaseContentLayout(viewModel = viewModel) {
+    BaseContentLayout(
+            viewModel = viewModel,
+            actionEventHandler = { _, actionEvent ->
 
-        uiState ->
+                when (actionEvent) {
+                    LoginActionEvent.NavigateToDashboard -> {
+                        onNavigateToDashboard()
+                    }
 
+                    LoginActionEvent.NavigateToRegistration -> {
+                        onNavigateToRegistration()
+                    }
+                }
+
+            }
+    ) { uiState ->
         LoginScreenContent(
                 uiState = uiState,
                 onEvent = viewModel::onEvent
@@ -62,84 +81,115 @@ private fun LoginScreenContent(
     val usernamePlaceholderText = stringResource(R.string.placeholder_text_username)
             .replaceFirstChar(Char::uppercaseChar)
 
-    Column(
+    val loginErrorState = uiState.loginErrorState
+    val showErrorBanner = with(loginErrorState) {
+        unknownError || accountNotFoundError || invalidCredentialsError
+    }
+
+
+    Box(
             modifier = modifier
+
                     .fillMaxSize()
                     .background(MaterialTheme.colorScheme.background)
+                    .safeDrawingPadding()
                     .imePadding()
                     .verticalScroll(rememberScrollState())
-                    .padding(horizontal = spacing.spaceMedium)
-                    .padding(top = spacing.spaceLargeMedium),
-            horizontalAlignment = Alignment.CenterHorizontally,
+
     ) {
-
-        AppIcon(modifier = Modifier.padding(bottom = spacing.spaceMedium))
-
         Column(
+                modifier = Modifier
+                        .padding(horizontal = spacing.spaceMedium)
+                        .padding(top = spacing.spaceLargeMedium),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(spacing.spaceSmall)
         ) {
-            Text(
-                    text = stringResource(R.string.header_text_welcome_back),
-                    style = MaterialTheme.typography.headlineMedium,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    textAlign = TextAlign.Center,
+
+            AppIcon(modifier = Modifier.padding(bottom = spacing.spaceMedium))
+
+            Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(spacing.spaceSmall)
+            ) {
+                Text(
+                        text = stringResource(R.string.header_text_welcome_back),
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        textAlign = TextAlign.Center,
+                )
+
+                Text(
+                        text = stringResource(R.string.caption_text_enter_login_details),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center,
+                )
+            }
+
+            Spacer(Modifier.height(36.dp))
+
+            Column(
+                    modifier = Modifier.padding(bottom = MaterialTheme.spacing.spaceTwelve * 2),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(spacing.spaceMedium)
+            ) {
+
+                AppInputField(
+                        state = uiState.usernameTextFieldState,
+                        placeholder = usernamePlaceholderText,
+                        modifier = Modifier.shadow(4.dp, MaterialTheme.shapes.large),
+                        textStyle = MaterialTheme.typography.bodyMedium,
+                        backgroundColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+                        showFocusBorder = true,
+                        errorMessageRes = uiState.usernameErrorRes
+                )
+
+                AppInputField(
+                        state = uiState.pinTextFieldState,
+                        placeholder = stringResource(R.string.placeholder_text_pin),
+                        modifier = Modifier.shadow(4.dp, MaterialTheme.shapes.large),
+                        textStyle = MaterialTheme.typography.bodyMedium,
+                        backgroundColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+                        showFocusBorder = true,
+                        keyboardType = KeyboardType.NumberPassword,
+                        isPassword = true,
+                        errorMessageRes = uiState.pinErrorRes
+                )
+            }
+
+            AppButton(
+                    modifier = Modifier.padding(bottom = spacing.spaceLarge),
+                    buttonText = stringResource(R.string.button_text_login),
+                    enabled = uiState.loginButtonEnabled,
+                    onClick = { onEvent(LoginUiEvent.Login) },
             )
 
-            Text(
-                    text = stringResource(R.string.caption_text_enter_login_details),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.Center,
+            TextButton(
+                    onClick = { onEvent(LoginUiEvent.Register) }
+            ) {
+                Text(
+                        text = stringResource(R.string.text_button_new_user),
+                        style = MaterialTheme.typography.titleMedium,
+                )
+            }
+        }
+
+        AnimatedVisibility(
+                modifier = Modifier.align(Alignment.BottomCenter),
+                visible = showErrorBanner,
+                enter = slideInVertically { it },
+                exit = slideOutVertically { it }
+        ) {
+
+            AppErrorBanner(
+                    modifier = Modifier.align(Alignment.BottomCenter),
+                    text = when {
+                        loginErrorState.invalidCredentialsError -> stringResource(R.string.banner_text_invalid_credentials)
+                        loginErrorState.accountNotFoundError -> stringResource(R.string.banner_text_no_account_found)
+                        else -> stringResource(id = R.string.banner_text_generic_error)
+                    }
             )
         }
 
-        Spacer(Modifier.height(36.dp))
-
-        Column(
-                modifier = Modifier.padding(bottom = MaterialTheme.spacing.spaceTwelve * 2),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(spacing.spaceMedium)
-        ) {
-
-            AppInputField(
-                    state = uiState.usernameTextFieldState,
-                    placeholder = usernamePlaceholderText,
-                    modifier = Modifier.shadow(4.dp, MaterialTheme.shapes.large),
-                    textStyle = MaterialTheme.typography.bodyMedium,
-                    backgroundColor = MaterialTheme.colorScheme.surfaceContainerLowest,
-                    showFocusBorder = true,
-                    errorMessageRes = uiState.usernameErrorRes
-            )
-
-            AppInputField(
-                    state = uiState.pinTextFieldState,
-                    placeholder = stringResource(R.string.placeholder_text_pin),
-                    modifier = Modifier.shadow(4.dp, MaterialTheme.shapes.large),
-                    textStyle = MaterialTheme.typography.bodyMedium,
-                    backgroundColor = MaterialTheme.colorScheme.surfaceContainerLowest,
-                    showFocusBorder = true,
-                    keyboardType = KeyboardType.NumberPassword,
-                    isPassword = true,
-                    errorMessageRes = uiState.pinErrorRes
-            )
-        }
-
-        AppButton(
-                modifier = Modifier.padding(bottom = spacing.spaceLarge),
-                buttonText = stringResource(R.string.button_text_login),
-                enabled = uiState.loginButtonEnabled,
-                onClick = { onEvent(LoginUiEvent.Login) },
-        )
-
-        TextButton(
-                onClick = { onEvent(LoginUiEvent.Register) }
-        ) {
-            Text(
-                    text = stringResource(R.string.text_button_new_user),
-                    style = MaterialTheme.typography.titleMedium,
-            )
-        }
     }
 }
 

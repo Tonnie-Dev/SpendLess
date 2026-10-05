@@ -46,6 +46,8 @@
     <string name="banner_text_pin_mismatch">PINs don’t match. Try again</string>
     <string name="banner_text_invalid_pin">Incorrect PIN. Please try again</string>
     <string name="banner_text_account_creation_error">Failed to create account. Please try again later.</string>
+    <string name="banner_text_invalid_credentials">Invalid username or PIN</string>
+    <string name="banner_text_no_account_found">No account found for this username</string>
 
     <!--Supporting Texts-->
     <string name="supporting_text_username_error_format">

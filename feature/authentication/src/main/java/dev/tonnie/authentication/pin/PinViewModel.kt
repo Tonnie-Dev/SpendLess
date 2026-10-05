@@ -6,14 +6,16 @@ import dev.tonnie.authentication.pin.handling.PinStage
 import dev.tonnie.authentication.pin.handling.PinUiEvent
 import dev.tonnie.authentication.pin.handling.PinUiState
 import dev.tonnie.domain.constants.AccountConstants.PIN_LENGTH
+import dev.tonnie.domain.constants.AppDefaults
 import dev.tonnie.domain.usecase.account.CreateAccountUseCase
 import dev.tonnie.domain.usecase.account.VerifyPinUseCase
 import dev.tonnie.exceptions.Resource
 import dev.tonnie.presentation.BaseViewModel
+import dev.tonnie.repository.SessionPrefs
 import dev.tonnie.repository.SessionRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlin.time.Duration.Companion.milliseconds
+import kotlinx.coroutines.flow.first
 
 typealias PinBaseViewModel = BaseViewModel<PinUiState, PinUiEvent, PinActionEvent>
 
@@ -21,7 +23,8 @@ class PinViewModel(
     val pinPurpose: PinPurpose,
     private val createAccountUseCase: CreateAccountUseCase,
     private val verifyPinUseCase: VerifyPinUseCase,
-    private val sessionRepository: SessionRepository
+    private val sessionRepository: SessionRepository,
+    private val sessionPrefs: SessionPrefs
 ) : PinBaseViewModel(initialState = PinUiState()) {
 
     private var createdPin: String? = null
@@ -110,7 +113,10 @@ class PinViewModel(
     private fun verifyPin() {
 
         launch {
-            when (val result = verifyPinUseCase(currentState.pin)) {
+
+            val currentUsername = sessionPrefs.activeUsername.first() ?: return@launch
+            when (val result =
+                verifyPinUseCase(username = currentUsername, pin = currentState.pin)) {
                 is Resource.Success -> {
                     if (result.data) {
                         sessionRepository.refreshSession()
@@ -185,7 +191,7 @@ class PinViewModel(
     private fun scheduleBannerDismissal() {
         dismissBannerJob?.cancel()
         dismissBannerJob = launch {
-            delay(2_000.milliseconds)
+            delay(AppDefaults.BANNER_DURATION_LENGTH)
 
             updateState { state ->
                 state.copy(

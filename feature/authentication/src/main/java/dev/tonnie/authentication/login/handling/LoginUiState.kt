@@ -10,14 +10,21 @@ data class LoginUiState(
 
     @StringRes
     val usernameErrorRes: Int? = null,
+    val isUsernameValid: Boolean = false,
 
     @StringRes
     val pinErrorRes: Int? = null,
-
-    val isUsernameValid: Boolean = false,
     val isPinValid: Boolean = false,
+
+    val loginErrorState: LoginErrorState = LoginErrorState()
 ) : UiState {
 
     val loginButtonEnabled: Boolean
         get() = isUsernameValid && isPinValid
+
+    data class LoginErrorState(
+        val invalidCredentialsError: Boolean = false,
+        val accountNotFoundError: Boolean = false,
+        val unknownError: Boolean = false,
+    )
 }
