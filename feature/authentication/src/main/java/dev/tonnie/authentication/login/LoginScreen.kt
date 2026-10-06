@@ -19,10 +19,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -86,6 +92,13 @@ private fun LoginScreenContent(
         unknownError || accountNotFoundError || invalidCredentialsError
     }
 
+    val usernameFocusRequester = remember { FocusRequester() }
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    LaunchedEffect(Unit) {
+        usernameFocusRequester.requestFocus()
+        keyboardController?.show()
+    }
 
     Box(
             modifier = modifier
@@ -134,25 +147,30 @@ private fun LoginScreenContent(
             ) {
 
                 AppInputField(
+                        modifier = Modifier
+                                .focusRequester(usernameFocusRequester)
+                                .shadow(4.dp, MaterialTheme.shapes.large),
                         state = uiState.usernameTextFieldState,
                         placeholder = usernamePlaceholderText,
-                        modifier = Modifier.shadow(4.dp, MaterialTheme.shapes.large),
                         textStyle = MaterialTheme.typography.bodyMedium,
                         backgroundColor = MaterialTheme.colorScheme.surfaceContainerLowest,
                         showFocusBorder = true,
-                        errorMessageRes = uiState.usernameErrorRes
+                        errorMessageRes = uiState.usernameErrorRes,
+                        imeAction = ImeAction.Next
                 )
 
                 AppInputField(
+                        modifier = Modifier.shadow(4.dp, MaterialTheme.shapes.large),
                         state = uiState.pinTextFieldState,
                         placeholder = stringResource(R.string.placeholder_text_pin),
-                        modifier = Modifier.shadow(4.dp, MaterialTheme.shapes.large),
                         textStyle = MaterialTheme.typography.bodyMedium,
                         backgroundColor = MaterialTheme.colorScheme.surfaceContainerLowest,
                         showFocusBorder = true,
                         keyboardType = KeyboardType.NumberPassword,
                         isPassword = true,
-                        errorMessageRes = uiState.pinErrorRes
+                        errorMessageRes = uiState.pinErrorRes,
+                        imeAction = ImeAction.Done,
+                        onKeyboardAction = { onEvent(LoginUiEvent.Login) }
                 )
             }
 

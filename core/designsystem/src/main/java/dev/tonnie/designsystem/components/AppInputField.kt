@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicSecureTextField
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.KeyboardActionHandler
+import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.TextObfuscationMode
 import androidx.compose.foundation.text.input.rememberTextFieldState
@@ -35,6 +37,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -55,8 +58,10 @@ fun AppInputField(
     backgroundColor: Color = MaterialTheme.colorScheme.surface,
     height: Dp = HEIGHT_SMALL,
     showFocusBorder: Boolean = false,
-    keyboardType: KeyboardType = KeyboardType.Text,
     isPassword: Boolean = false,
+    keyboardType: KeyboardType = KeyboardType.Text,
+    imeAction: ImeAction = ImeAction.Default,
+    onKeyboardAction: KeyboardActionHandler? = null,
     @StringRes
     errorMessageRes: Int? = null,
 ) {
@@ -80,7 +85,11 @@ fun AppInputField(
                             textAlign = textAlign,
                     ),
                     cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-                    keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+                    keyboardOptions = KeyboardOptions(
+                            keyboardType = keyboardType,
+                            imeAction = imeAction
+                    ),
+                    onKeyboardAction = onKeyboardAction,
                     textObfuscationMode = if (showPassword)
                         TextObfuscationMode.Visible
                     else
@@ -128,6 +137,11 @@ fun AppInputField(
                             textAlign = textAlign
                     ),
                     cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                    lineLimits = TextFieldLineLimits.SingleLine,
+                    keyboardOptions = KeyboardOptions(keyboardType = keyboardType,
+                            imeAction = imeAction
+                    ),
+                    onKeyboardAction = onKeyboardAction,
                     decorator = { innerTextField ->
                         TextFieldDecorator(
                                 isFocused = isFocused,
@@ -141,7 +155,6 @@ fun AppInputField(
                                 backgroundColor = backgroundColor,
                         )
                     },
-                    keyboardOptions = KeyboardOptions(keyboardType = keyboardType)
             )
 
         if (errorMessageRes != null) {
