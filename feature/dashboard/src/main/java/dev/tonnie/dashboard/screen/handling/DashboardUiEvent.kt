@@ -1,6 +1,6 @@
 package dev.tonnie.dashboard.screen.handling
 
-import dev.tonnie.presentation.handling.UiEvent
+import dev.tonnie.presentation.base.handling.UiEvent
 
 sealed interface DashboardUiEvent : UiEvent{
 

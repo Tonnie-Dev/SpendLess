@@ -10,7 +10,7 @@ import dev.tonnie.domain.constants.AppDefaults
 import dev.tonnie.domain.usecase.account.CreateAccountUseCase
 import dev.tonnie.domain.usecase.account.VerifyPinUseCase
 import dev.tonnie.exceptions.Resource
-import dev.tonnie.presentation.BaseViewModel
+import dev.tonnie.presentation.base.BaseViewModel
 import dev.tonnie.repository.SessionPrefs
 import dev.tonnie.repository.SessionRepository
 import kotlinx.coroutines.Job

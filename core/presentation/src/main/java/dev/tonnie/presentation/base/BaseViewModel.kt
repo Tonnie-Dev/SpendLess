@@ -1,13 +1,13 @@
-package dev.tonnie.presentation
+package dev.tonnie.presentation.base
 
 import androidx.lifecycle.ViewModel
 
 
 
 import androidx.lifecycle.viewModelScope
-import dev.tonnie.presentation.handling.ActionEvent
-import dev.tonnie.presentation.handling.UiEvent
-import dev.tonnie.presentation.handling.UiState
+import dev.tonnie.presentation.base.handling.ActionEvent
+import dev.tonnie.presentation.base.handling.UiEvent
+import dev.tonnie.presentation.base.handling.UiState
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job

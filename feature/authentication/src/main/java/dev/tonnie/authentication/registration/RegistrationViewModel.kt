@@ -13,7 +13,7 @@ import dev.tonnie.domain.usecase.account.IsUsernameAvailableUseCase
 import dev.tonnie.domain.usecase.account.ValidateUsernameUseCase
 import dev.tonnie.exceptions.DataError
 import dev.tonnie.exceptions.Resource
-import dev.tonnie.presentation.BaseViewModel
+import dev.tonnie.presentation.base.BaseViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay

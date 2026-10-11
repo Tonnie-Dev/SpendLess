@@ -1,6 +1,6 @@
 package dev.tonnie.authentication.pin.handling
 
-import dev.tonnie.presentation.handling.ActionEvent
+import dev.tonnie.presentation.base.handling.ActionEvent
 
 sealed interface PinActionEvent: ActionEvent {
     object NavigateBack : PinActionEvent

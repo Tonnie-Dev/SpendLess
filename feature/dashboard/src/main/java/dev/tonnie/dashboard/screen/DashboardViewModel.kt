@@ -3,7 +3,7 @@ package dev.tonnie.dashboard.screen
 import dev.tonnie.dashboard.screen.handling.DashboardActionEvent
 import dev.tonnie.dashboard.screen.handling.DashboardUiEvent
 import dev.tonnie.dashboard.screen.handling.DashboardUiState
-import dev.tonnie.presentation.BaseViewModel
+import dev.tonnie.presentation.base.BaseViewModel
 
 typealias BaseDashboardViewModel = BaseViewModel<DashboardUiState, DashboardUiEvent, DashboardActionEvent>
 

@@ -1,6 +1,6 @@
 package dev.tonnie.authentication.pin.handling
 
-import dev.tonnie.presentation.handling.UiState
+import dev.tonnie.presentation.base.handling.UiState
 
 data class PinUiState(
     val pin: String = "",

@@ -2,7 +2,7 @@ package dev.tonnie.authentication.login.handling
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.text.input.TextFieldState
-import dev.tonnie.presentation.handling.UiState
+import dev.tonnie.presentation.base.handling.UiState
 
 data class LoginUiState(
     val usernameTextFieldState: TextFieldState = TextFieldState(),

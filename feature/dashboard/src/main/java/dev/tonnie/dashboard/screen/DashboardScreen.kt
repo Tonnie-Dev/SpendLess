@@ -19,6 +19,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -36,12 +39,16 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import dev.tonnie.dashboard.R
+import dev.tonnie.dashboard.screen.handling.DashboardActionEvent
 import dev.tonnie.dashboard.screen.handling.DashboardUiEvent
+import dev.tonnie.dashboard.screen.handling.DashboardUiState
 import dev.tonnie.designsystem.theme.HorizontalRoundedCornerShape16
+import dev.tonnie.designsystem.theme.RoundedCornerShape20
 import dev.tonnie.designsystem.theme.SpendLessTheme
 import dev.tonnie.designsystem.theme.spacing
 import dev.tonnie.designsystem.utils.SetStatusBarIconsColor
-import dev.tonnie.presentation.BaseContentLayout
+import dev.tonnie.presentation.base.BaseContentLayout
+import dev.tonnie.presentation.formatting.CurrencyFormatter
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -54,9 +61,34 @@ fun DashboardScreen(
 
     SetStatusBarIconsColor(darkIcons = false)
 
-    BaseContentLayout(viewModel = viewModel) {
+    BaseContentLayout(
+            viewModel = viewModel,
+            actionEventHandler = { context, actionEvent ->
+
+                when (actionEvent) {
+                    DashboardActionEvent.NavigateToSetting -> onSettingsClick()
+                    DashboardActionEvent.NavigateToAddTransaction -> onAddTransaction()
+                    DashboardActionEvent.NavigateToExport -> onExport()
+                }
+            },
+            floatingActionButton = {
+
+                FloatingActionButton(
+                        onClick = { viewModel.onEvent(DashboardUiEvent.AddTransaction) },
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                        shape = MaterialTheme.shapes.RoundedCornerShape20,
+                        content = {
+                            Icon(
+                                    imageVector = Icons.Default.Add,
+                                    contentDescription = stringResource(R.string.cds_text_add_transaction)
+                            )
+                        }
+                )
+            }) { uiState ->
         DashboardScreenContent(
                 modifier = Modifier,
+                uiState = uiState,
                 onEvent = viewModel::onEvent
         )
     }
@@ -65,14 +97,12 @@ fun DashboardScreen(
 @Composable
 fun DashboardScreenContent(
     modifier: Modifier = Modifier,
-    username: String = "rockefeller74",
-    accountBalance: String = "$10,382.45",
-    previousWeekAmount: String = "$0",
+    uiState: DashboardUiState,
     onEvent: (DashboardUiEvent) -> Unit
 ) {
     val spacing = MaterialTheme.spacing
     val colors = MaterialTheme.colorScheme
-
+    val currencyFormatter = CurrencyFormatter()
     BoxWithConstraints(
             modifier = modifier
                     .fillMaxSize()
@@ -102,7 +132,7 @@ fun DashboardScreenContent(
                     modifier = Modifier
                             .fillMaxWidth()
                             .height(overviewHeight)
-                             .statusBarsPadding()
+                            .statusBarsPadding()
                             .padding(all = spacing.spaceMedium),
             ) {
                 Row(
@@ -114,7 +144,7 @@ fun DashboardScreenContent(
                             modifier = Modifier
                                     .weight(1f)
                                     .padding(end = 0.dp),
-                            text = username,
+                            text = uiState.username,
                             style = MaterialTheme.typography.titleLarge,
                             color = colors.onPrimary,
                             maxLines = 1,
@@ -162,10 +192,12 @@ fun DashboardScreenContent(
                         verticalArrangement = Arrangement.Center,
                 ) {
                     Text(
-                            text = accountBalance,
+                            text = currencyFormatter.format(uiState.accountBalance),
                             style = MaterialTheme.typography.displayLarge,
                             color = colors.onPrimary,
                             textAlign = TextAlign.Center,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
                     )
                     Text(
                             text = stringResource(R.string.caption_text_account_balance),
@@ -173,7 +205,11 @@ fun DashboardScreenContent(
                             color = colors.onPrimary.copy(alpha = 0.7f),
                     )
                 }
-                DashboardSummary(previousWeekAmount)
+
+                DashboardSummary(
+                        previousWeekAmount = currencyFormatter
+                                .format(uiState.previousWeekAmount)
+                )
             }
             Box(
                     modifier = Modifier
@@ -272,6 +308,13 @@ private fun DashboardSummary(previousWeekAmount: String) {
 @Composable
 private fun DashboardScreenPreview() {
     SpendLessTheme {
-        DashboardScreenContent(onEvent = {})
+        DashboardScreenContent(
+                uiState = DashboardUiState(
+                        username = "Ein",
+                        accountBalance = 1000.286,
+                        previousWeekAmount = 10245.0
+                ),
+                onEvent = {}
+        )
     }
 }

@@ -34,7 +34,7 @@ import dev.tonnie.designsystem.icon.AppIcon
 import dev.tonnie.designsystem.theme.OnBackgroundStateLayer08
 import dev.tonnie.designsystem.theme.SpendLessTheme
 import dev.tonnie.designsystem.theme.spacing
-import dev.tonnie.presentation.BaseContentLayout
+import dev.tonnie.presentation.base.BaseContentLayout
 import org.koin.androidx.compose.koinViewModel
 
 @Composable

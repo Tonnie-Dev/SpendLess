@@ -1,4 +1,4 @@
-package dev.tonnie.presentation
+package dev.tonnie.presentation.base
 
 import android.content.Context
 import androidx.activity.compose.BackHandler
@@ -22,9 +22,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
-import dev.tonnie.presentation.handling.ActionEvent
-import dev.tonnie.presentation.handling.UiEvent
-import dev.tonnie.presentation.handling.UiState
+import dev.tonnie.presentation.base.handling.ActionEvent
+import dev.tonnie.presentation.base.handling.UiEvent
+import dev.tonnie.presentation.base.handling.UiState
 import kotlinx.coroutines.CoroutineScope
 
 @Composable

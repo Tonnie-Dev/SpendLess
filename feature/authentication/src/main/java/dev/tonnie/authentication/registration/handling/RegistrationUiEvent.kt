@@ -1,6 +1,6 @@
 package dev.tonnie.authentication.registration.handling
 
-import dev.tonnie.presentation.handling.UiEvent
+import dev.tonnie.presentation.base.handling.UiEvent
 
 sealed interface RegistrationUiEvent : UiEvent {
     data object NextClicked : RegistrationUiEvent

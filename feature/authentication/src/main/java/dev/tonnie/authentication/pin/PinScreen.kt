@@ -52,7 +52,7 @@ import dev.tonnie.designsystem.theme.OnSurfaceStateLayer12
 import dev.tonnie.designsystem.theme.SpendLessTheme
 import dev.tonnie.designsystem.theme.spacing
 import dev.tonnie.domain.constants.AccountConstants.PIN_LENGTH
-import dev.tonnie.presentation.BaseContentLayout
+import dev.tonnie.presentation.base.BaseContentLayout
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 

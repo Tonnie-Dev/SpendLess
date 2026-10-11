@@ -11,7 +11,7 @@ import dev.tonnie.domain.usecase.account.ValidateUsernameUseCase
 import dev.tonnie.domain.usecase.account.VerifyPinUseCase
 import dev.tonnie.exceptions.DataError
 import dev.tonnie.exceptions.Resource
-import dev.tonnie.presentation.BaseViewModel
+import dev.tonnie.presentation.base.BaseViewModel
 import dev.tonnie.repository.SessionRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

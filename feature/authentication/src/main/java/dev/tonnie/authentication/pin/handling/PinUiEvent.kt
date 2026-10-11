@@ -1,6 +1,6 @@
 package dev.tonnie.authentication.pin.handling
 
-import dev.tonnie.presentation.handling.UiEvent
+import dev.tonnie.presentation.base.handling.UiEvent
 
 sealed interface PinUiEvent: UiEvent{
 
