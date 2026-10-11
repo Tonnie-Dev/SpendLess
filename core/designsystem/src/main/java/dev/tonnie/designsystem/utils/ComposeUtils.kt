@@ -1,0 +1,109 @@
+package dev.tonnie.designsystem.utils
+
+import android.app.Activity
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
+import androidx.core.view.WindowCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
+
+inline fun Modifier.ifThen(flag: Boolean, modifierBuilder: Modifier.() -> Modifier): Modifier =
+    if (flag) this.modifierBuilder() else this
+
+@Composable
+fun SetStatusBarIconsColor(darkIcons: Boolean) {
+
+    val view = LocalView.current
+
+    val insetsController = remember(view) {
+        (view.context as? Activity)
+                ?.window
+                ?.let { WindowCompat.getInsetsController(it, it.decorView) }
+    }
+
+    SideEffect {
+        insetsController?.isAppearanceLightStatusBars = darkIcons
+    }
+}
+
+@Composable
+fun IntSize.toDpSize(): DpSize {
+    return DpSize(
+            width = with(LocalDensity.current) { width.toDp() },
+            height = with(LocalDensity.current) { height.toDp() }
+    )
+}
+
+@Composable
+fun InvisibleSpacer(
+    componentSize: IntSize,
+    modifier: Modifier = Modifier
+) {
+    Spacer(
+            modifier = modifier
+                    .size(with(LocalDensity.current) {
+                        componentSize.toDpSize()
+                    }
+                    )
+    )
+}
+
+@Composable
+fun Modifier.clickableWithoutRipple(onClick: () -> Unit): Modifier =
+    this.then(Modifier.pointerInput(Unit) {
+        detectTapGestures(onTap = { onClick() }
+        )
+    })
+
+/*@Composable
+fun rememberIsDeviceWide(): Boolean {
+    val activity = LocalActivity.current ?: return false
+    val windowClass = calculateWindowSizeClass(activity)
+    val deviceType = DeviceType.fromWindowSizeClass(windowClass)
+    return remember(windowClass) { deviceType != DeviceType.MOBILE_PORTRAIT }
+}*/
+
+@Composable
+fun borderStroke(outlineColor: Color = MaterialTheme.colorScheme.outline) = BorderStroke(
+        width = 1.dp,
+        color = outlineColor
+)
+
+
+@Composable
+fun OnResumeEffect( onResume:()-> Unit){
+
+    val lifeCycleOwner = LocalLifecycleOwner.current
+
+    DisposableEffect(lifeCycleOwner) {
+
+        val observer = LifecycleEventObserver { _,event ->
+            if (event == Lifecycle.Event.ON_RESUME){
+                onResume()
+            }
+        }
+
+        lifeCycleOwner.lifecycle.addObserver(observer)
+
+        onDispose {
+            lifeCycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+}
+
