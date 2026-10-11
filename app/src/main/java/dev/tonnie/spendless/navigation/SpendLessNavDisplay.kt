@@ -11,12 +11,12 @@ import dev.tonnie.authentication.login.LoginScreen
 import dev.tonnie.authentication.pin.PinScreen
 import dev.tonnie.authentication.pin.handling.PinPurpose
 import dev.tonnie.authentication.registration.RegistrationScreen
-import dev.tonnie.dashboard.DashboardScreen
+import dev.tonnie.dashboard.screen.DashboardScreen
 
 @Composable
 fun SpendlessNavDisplay() {
 
-    val backStack = rememberNavBackStack(RegistrationDestination)
+    val backStack = rememberNavBackStack(DashboardDestination)
 
     val navigator = remember(backStack) {
         Navigator(backStack = backStack)
@@ -60,7 +60,7 @@ fun SpendlessNavDisplay() {
         }
         entry<DashboardDestination> {
 
-            DashboardScreen()
+            DashboardScreen(onSettingsClick = {}, onAddTransaction = {}, onExport = {})
         }
     }
 

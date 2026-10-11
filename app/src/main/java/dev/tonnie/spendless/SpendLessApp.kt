@@ -2,6 +2,7 @@ package dev.tonnie.spendless
 
 import android.app.Application
 import dev.tonnie.authentication.di.authenticationModule
+import dev.tonnie.dashboard.di.dashboardModule
 import dev.tonnie.data.di.dataModule
 import dev.tonnie.database.di.databaseModule
 import dev.tonnie.datastore.di.dataStoreModule
@@ -22,7 +23,8 @@ class SpendLessApp : Application(){
                     dataModule,
                     dataStoreModule,
                     domainModule,
-                    authenticationModule
+                    authenticationModule,
+                    dashboardModule
             )
         }
     }
