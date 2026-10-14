@@ -1,5 +1,6 @@
 package dev.tonnie.dashboard.screen
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -54,9 +56,10 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun DashboardScreen(
     viewModel: DashboardViewModel = koinViewModel(),
-    onSettingsClick: () -> Unit,
-    onAddTransaction: () -> Unit,
-    onExport: () -> Unit
+    onNavigateToPin: () -> Unit,
+    onNavigateToSettings: () -> Unit,
+    onNavigateToAddTransaction: () -> Unit,
+    onNavigateToExport: () -> Unit
 ) {
 
     SetStatusBarIconsColor(darkIcons = false)
@@ -66,14 +69,20 @@ fun DashboardScreen(
             actionEventHandler = { context, actionEvent ->
 
                 when (actionEvent) {
-                    DashboardActionEvent.NavigateToSetting -> onSettingsClick()
-                    DashboardActionEvent.NavigateToAddTransaction -> onAddTransaction()
-                    DashboardActionEvent.NavigateToExport -> onExport()
+                    DashboardActionEvent.NavigateToSetting -> onNavigateToSettings()
+                    DashboardActionEvent.NavigateToAddTransaction -> onNavigateToAddTransaction()
+                    DashboardActionEvent.NavigateToExport -> onNavigateToExport()
+                    DashboardActionEvent.NavigateToPin -> onNavigateToPin()
+                    DashboardActionEvent.ShowToast -> {
+                        Toast.makeText(context, "Session Active", Toast.LENGTH_SHORT).show()
+                    }
+
                 }
             },
             floatingActionButton = {
 
                 FloatingActionButton(
+                        modifier = Modifier.navigationBarsPadding(),
                         onClick = { viewModel.onEvent(DashboardUiEvent.AddTransaction) },
                         containerColor = MaterialTheme.colorScheme.secondaryContainer,
                         contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
@@ -219,7 +228,7 @@ fun DashboardScreenContent(
                                     color = colors.background,
                                     shape = MaterialTheme.shapes.HorizontalRoundedCornerShape16
                             ),
-                    //.navigationBarsPadding()
+               //     .navigationBarsPadding(),
                     contentAlignment = Alignment.Center,
             ) {
                 Column(

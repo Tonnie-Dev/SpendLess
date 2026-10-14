@@ -14,5 +14,6 @@ dependencies {
     implementation(project(":core:datastore"))
     implementation(project(":core:presentation"))
     implementation(project(":core:domain"))
+    implementation(project(":core:repository"))
 }
 

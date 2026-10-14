@@ -2,7 +2,7 @@ package dev.tonnie.dashboard.screen.handling
 
 import dev.tonnie.presentation.base.handling.UiState
 
-class DashboardUiState(
+data class DashboardUiState(
     val username: String = "",
     val accountBalance: Double = 0.0,
     val previousWeekAmount: Double = 0.0,

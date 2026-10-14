@@ -11,11 +11,9 @@ import dev.tonnie.domain.usecase.account.CreateAccountUseCase
 import dev.tonnie.domain.usecase.account.VerifyPinUseCase
 import dev.tonnie.exceptions.Resource
 import dev.tonnie.presentation.base.BaseViewModel
-import dev.tonnie.repository.SessionPrefs
 import dev.tonnie.repository.SessionRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.first
 
 typealias PinBaseViewModel = BaseViewModel<PinUiState, PinUiEvent, PinActionEvent>
 
@@ -24,8 +22,15 @@ class PinViewModel(
     private val createAccountUseCase: CreateAccountUseCase,
     private val verifyPinUseCase: VerifyPinUseCase,
     private val sessionRepository: SessionRepository,
-    private val sessionPrefs: SessionPrefs
 ) : PinBaseViewModel(initialState = PinUiState()) {
+
+    init {
+
+        if (pinPurpose is PinPurpose.UnlockAccount) {
+
+            observeCurrentUser()
+        }
+    }
 
     private var createdPin: String? = null
     private var dismissBannerJob: Job? = null
@@ -38,7 +43,24 @@ class PinViewModel(
         }
     }
 
+    private fun observeCurrentUser() {
+        launch {
+            sessionRepository.activeUsername.collect { currentUser ->
+                if (currentUser == null) {
+                    sendActionEvent(PinActionEvent.NavigateToLogin)
+                } else {
+                    updateState { state -> state.copy(currentUser = currentUser) }
+                }
+            }
+        }
+    }
+
     private fun onPressPinDigit(digit: String) {
+        if (
+            pinPurpose is PinPurpose.UnlockAccount &&
+            currentState.currentUser == null
+        ) return
+
         if (
             digit.length != 1
             || !digit.all { it.isDigit() }
@@ -77,9 +99,17 @@ class PinViewModel(
     }
 
     private fun onPinCompleted() {
-        when (currentState.pinStage) {
-            PinStage.CREATE -> enterConfirmPinStage()
-            PinStage.CONFIRM -> comparePins()
+        when (pinPurpose) {
+            is PinPurpose.CreateAccount -> {
+                when (currentState.pinStage) {
+                    PinStage.CREATE -> enterConfirmPinStage()
+                    PinStage.CONFIRM -> comparePins()
+                }
+            }
+
+            is PinPurpose.UnlockAccount -> {
+                verifyPin()
+            }
         }
     }
 
@@ -114,7 +144,7 @@ class PinViewModel(
 
         launch {
 
-            val currentUsername = sessionPrefs.activeUsername.first() ?: return@launch
+            val currentUsername = currentState.currentUser ?: return@launch
             when (val result =
                 verifyPinUseCase(username = currentUsername, pin = currentState.pin)) {
                 is Resource.Success -> {

@@ -7,4 +7,6 @@ sealed interface DashboardActionEvent : ActionEvent{
     object NavigateToSetting: DashboardActionEvent
     object NavigateToAddTransaction: DashboardActionEvent
     object NavigateToExport: DashboardActionEvent
+    object NavigateToPin: DashboardActionEvent
+    object ShowToast: DashboardActionEvent
 }

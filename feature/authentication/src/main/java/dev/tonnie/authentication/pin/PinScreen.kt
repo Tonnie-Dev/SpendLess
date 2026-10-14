@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
@@ -78,8 +79,10 @@ fun PinScreen(
             }
     ) { state ->
         PinScreenContent(
+                modifier = Modifier.navigationBarsPadding(),
                 uiState = state,
                 onEvent = viewModel::onEvent,
+                pinPurpose = pinPurpose
         )
     }
 }
@@ -88,6 +91,7 @@ fun PinScreen(
 private fun PinScreenContent(
     uiState: PinUiState,
     onEvent: (PinUiEvent) -> Unit,
+    pinPurpose: PinPurpose,
     modifier: Modifier = Modifier,
 ) {
     val pin = uiState.pin
@@ -104,15 +108,28 @@ private fun PinScreenContent(
 
     val showSpinner = uiState.isCreatingAccount
 
-    val (headerText, captionText) = when (uiState.pinStage) {
-        PinStage.CREATE -> {
-            stringResource(R.string.header_text_create_pin) to
-                    stringResource(R.string.caption_text_create_pin)
+    val ( headerText, captionText) = when (pinPurpose) {
+
+        PinPurpose.UnlockAccount -> {
+            stringResource(R.string.header_text_hello_user, uiState.currentUser.orEmpty()) to
+                    stringResource(R.string.caption_text_enter_pin)
         }
 
-        PinStage.CONFIRM -> {
-            stringResource(R.string.header_text_repeat_pin) to
-                    stringResource(R.string.caption_text_reenter_pin)
+        is PinPurpose.CreateAccount -> {
+
+            when(uiState.pinStage){
+
+                PinStage.CREATE -> {
+                    stringResource(R.string.header_text_create_pin) to
+                            stringResource(R.string.caption_text_create_pin)
+                }
+
+                PinStage.CONFIRM -> {
+                    stringResource(R.string.header_text_repeat_pin) to
+                            stringResource(R.string.caption_text_reenter_pin)
+                }
+
+            }
         }
     }
 
@@ -304,7 +321,8 @@ private fun PinScreenContentPreview() {
     SpendLessTheme {
         PinScreenContent(
                 uiState = PinUiState(),
-                onEvent = {}
+                onEvent = {},
+                pinPurpose = PinPurpose.UnlockAccount
         )
     }
 }

@@ -47,7 +47,18 @@ fun SpendlessNavDisplay() {
             PinScreen(
                     pinPurpose = purpose,
                     onNavigateBack = navigator::popBackstack,
-                    onNavigateToDashboard = navigator::navigateToDashboard,
+                    onNavigateToDashboard = {
+
+                        when (purpose) {
+                            is PinPurpose.CreateAccount -> {
+                                navigator.navigateToDashboard()
+                            }
+
+                            PinPurpose.UnlockAccount -> {
+                                navigator.navigateBackToDashboard()
+                            }
+                        }
+                    },
                     onNavigateToLogin = navigator::navigateToLogin
             )
         }
@@ -60,7 +71,11 @@ fun SpendlessNavDisplay() {
         }
         entry<DashboardDestination> {
 
-            DashboardScreen(onSettingsClick = {}, onAddTransaction = {}, onExport = {})
+            DashboardScreen(
+                    onNavigateToPin = { navigator.navigateToPin(mode = PinMode.Unlock) },
+                    onNavigateToSettings = {},
+                    onNavigateToAddTransaction = {},
+                    onNavigateToExport = {})
         }
     }
 

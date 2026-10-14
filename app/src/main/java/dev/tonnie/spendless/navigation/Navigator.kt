@@ -9,7 +9,6 @@ class Navigator(private val backStack: NavBackStack<NavKey>) {
         push(RegistrationDestination)
     }
 
-
     fun navigateToPin(mode: PinMode) {
         push(PinDestination(mode))
     }
@@ -21,6 +20,20 @@ class Navigator(private val backStack: NavBackStack<NavKey>) {
 
     fun navigateToDashboard() {
         push(DashboardDestination)
+    }
+
+    fun navigateBackToDashboard() {
+        val dashboardIndex = backStack.indexOfLast {
+            it == DashboardDestination
+        }
+
+        if (dashboardIndex >= 0) {
+            while (backStack.lastIndex > dashboardIndex) {
+                backStack.removeLastOrNull()
+            }
+        } else {
+            clearAndReplace(DashboardDestination)
+        }
     }
 
     fun popBackstack() {

@@ -70,7 +70,8 @@ internal class SessionPrefsImpl(
         val SESSION_DURATION_KEY = longPreferencesKey("session_duration")
         val ACTIVE_USERNAME_KEY = stringPreferencesKey("active_username")
 
-        const val DEFAULT_SESSION_DURATION_MILLIS = 5 * 60 * 1000L
+        const val DEFAULT_SESSION_DURATION_MILLIS = 30* 1000L
+        //const val DEFAULT_SESSION_DURATION_MILLIS = 5 * 60 * 1000L
     }
 }
 
