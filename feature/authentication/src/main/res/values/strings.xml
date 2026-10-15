@@ -11,9 +11,11 @@
     <!--Header Texts-->
     <string name="header_text_welcome">Welcome to SpendLess!\nHow can we address you?</string>
     <string name="header_text_create_pin">Create PIN</string>
+    <string name="header_text_hello_user">Hello, %1$s!</string>
     <string name="header_text_welcome_back">Welcome back!</string>
     <string name="header_text_welcome_with_username">Welcome, %1$s!</string>
     <string name="header_text_repeat_pin">Repeat your PIN</string>
+    <string name="header_text_many_attempts">Too many failed attempts</string>
 
     <!--Caption Texts-->
     <string name="caption_text_create_name">Create unique username</string>
@@ -21,6 +23,7 @@
     <string name="caption_text_enter_login_details">Enter your login details</string>
     <string name="caption_text_enter_pin">Enter your PIN</string>
     <string name="caption_text_reenter_pin">Enter your PIN again</string>
+    <string name="caption_text_try_in">Try your PIN again in %1$s</string>
 
     <!--Content Description Texts-->
     <string name="cds_text_menu">Menu</string>

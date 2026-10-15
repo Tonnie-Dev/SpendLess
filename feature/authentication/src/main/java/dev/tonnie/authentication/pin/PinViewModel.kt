@@ -1,5 +1,6 @@
 package dev.tonnie.authentication.pin
 
+import dev.tonnie.authentication.login.handling.LoginUiState
 import dev.tonnie.authentication.pin.handling.PinActionEvent
 import dev.tonnie.authentication.pin.handling.PinPurpose
 import dev.tonnie.authentication.pin.handling.PinStage
@@ -12,8 +13,10 @@ import dev.tonnie.domain.usecase.account.VerifyPinUseCase
 import dev.tonnie.exceptions.Resource
 import dev.tonnie.presentation.base.BaseViewModel
 import dev.tonnie.repository.SessionRepository
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlin.time.Duration.Companion.milliseconds
 
 typealias PinBaseViewModel = BaseViewModel<PinUiState, PinUiEvent, PinActionEvent>
 
@@ -33,7 +36,10 @@ class PinViewModel(
     }
 
     private var createdPin: String? = null
+    private var isVerifyingPin = false
+
     private var dismissBannerJob: Job? = null
+    private var lockoutJob: Job? = null
 
     override fun onEvent(event: PinUiEvent) {
         when (event) {
@@ -56,6 +62,9 @@ class PinViewModel(
     }
 
     private fun onPressPinDigit(digit: String) {
+
+        if (currentState.lockState.isPinLocked) return
+
         if (
             pinPurpose is PinPurpose.UnlockAccount &&
             currentState.currentUser == null
@@ -66,6 +75,8 @@ class PinViewModel(
             || !digit.all { it.isDigit() }
             || currentState.pin.length >= PIN_LENGTH
         ) return
+
+        clearLoginError()
 
         val updatedPin = currentState.pin + digit
 
@@ -84,7 +95,26 @@ class PinViewModel(
     }
 
     private fun onPressPinBackspace() {
+        if (currentState.lockState.isPinLocked) return
         updateState { state -> state.copy(pin = state.pin.dropLast(1)) }
+    }
+
+
+    private fun clearLoginError() {
+
+        val errorState = currentState.pinErrorState
+        if (errorState.pinMismatchError ||
+            errorState.invalidPinError ||
+            errorState.pinVerificationError ||
+            errorState.accountCreationError
+        ) {
+            dismissBannerJob?.cancel()
+            updateState { state ->
+                state.copy(
+                        pinErrorState = PinUiState.PinErrorState()
+                )
+            }
+        }
     }
 
     private fun enterConfirmPinStage() {
@@ -122,17 +152,6 @@ class PinViewModel(
         }
     }
 
-    private fun onPinsMismatch() {
-        updateState { state ->
-            state.copy(
-                    pin = "",
-                    pinErrorState = state.pinErrorState.copy(pinMismatchError = true)
-            )
-        }
-
-        scheduleBannerDismissal()
-    }
-
     private fun onPinsMatch() {
         when (pinPurpose) {
             is PinPurpose.CreateAccount -> createAccount(pinPurpose.username)
@@ -140,23 +159,103 @@ class PinViewModel(
         }
     }
 
+    private fun onPinsMismatch() {
+        updateState { state ->
+            state.copy(
+                    pin = "",
+                    pinErrorState = state.pinErrorState.copy(pinMismatchError = true)
+            )
+        }
+        scheduleBannerDismissal()
+    }
+
+    private fun onInvalidPinAttempt() {
+
+        val failedAttempts = currentState.lockState.failedPinAttempts + 1
+        updateState { state ->
+            state.copy(
+                    pin = "",
+                    lockState = state.lockState.copy(failedPinAttempts = failedAttempts),
+                    pinErrorState = state.pinErrorState.copy(invalidPinError = true)
+            )
+        }
+        scheduleBannerDismissal()
+
+
+        if (failedAttempts >= AppDefaults.MAX_PIN_ATTEMPTS) {
+            startPinLockout()
+        }
+    }
+
+    private fun startPinLockout() {
+        lockoutJob?.cancel()
+        lockoutJob = launch {
+            updateState { state ->
+
+                state.copy(
+                        pin = "",
+                        lockState = state.lockState.copy(
+                                isPinLocked = true,
+                                lockoutRemainingSeconds = AppDefaults.PIN_LOCKOUT_DURATION_SECONDS
+                        )
+                )
+            }
+
+            while (currentState.lockState.lockoutRemainingSeconds > 0) {
+                delay(1000.milliseconds)
+                updateState { state ->
+                    state.copy(
+                            lockState = state.lockState.copy(
+                                    lockoutRemainingSeconds = (state.lockState.lockoutRemainingSeconds - 1)
+                                            .coerceAtLeast(0)
+                            )
+                    )
+                }
+            }
+
+            updateState { state ->
+                state.copy(
+                        lockState = state.lockState.copy(
+                                isPinLocked = false,
+                                failedPinAttempts = 0,
+                                lockoutRemainingSeconds = 0
+                        )
+                )
+            }
+        }
+    }
+
     private fun verifyPin() {
 
+        if (isVerifyingPin || currentState.lockState.isPinLocked) return
+        val currentUsername = currentState.currentUser ?: return
+        val pin = currentState.pin
+
+
+
         launch {
-
-            val currentUsername = currentState.currentUser ?: return@launch
-            when (val result =
-                verifyPinUseCase(username = currentUsername, pin = currentState.pin)) {
-                is Resource.Success -> {
-                    if (result.data) {
-                        sessionRepository.refreshSession()
-                        sendActionEvent(PinActionEvent.NavigateToDashboard)
-                    } else {
-                        onInvalidPin()
+            try {
+                isVerifyingPin = true
+                when (val result =
+                    verifyPinUseCase(username = currentUsername, pin = pin)) {
+                    is Resource.Success -> {
+                        if (result.data) {
+                            sessionRepository.refreshSession()
+                            sendActionEvent(PinActionEvent.NavigateToDashboard)
+                        } else {
+                            onInvalidPinAttempt()
+                        }
                     }
-                }
 
-                is Resource.Error -> onPinVerificationError()
+                    is Resource.Error -> onPinVerificationError()
+                }
+            }catch (e: CancellationException) {
+               throw e
+            }
+            catch (e: Exception) {
+                onPinVerificationError()
+            } finally {
+                isVerifyingPin = false
             }
         }
     }
@@ -193,6 +292,7 @@ class PinViewModel(
         }
     }
 
+/*
     private fun onInvalidPin() {
         updateState { state ->
             state.copy(
@@ -204,6 +304,7 @@ class PinViewModel(
         }
         scheduleBannerDismissal()
     }
+*/
 
     private fun onPinVerificationError() {
         updateState { state ->

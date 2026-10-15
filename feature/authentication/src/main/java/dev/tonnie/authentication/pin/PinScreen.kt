@@ -60,9 +60,7 @@ import org.koin.core.parameter.parametersOf
 @Composable
 fun PinScreen(
     pinPurpose: PinPurpose,
-    viewModel: PinViewModel = koinViewModel(
-            parameters = { parametersOf(pinPurpose) }
-    ),
+    viewModel: PinViewModel = koinViewModel(parameters = { parametersOf(pinPurpose) }),
     onNavigateBack: () -> Unit,
     onNavigateToLogin: () -> Unit,
     onNavigateToDashboard: () -> Unit,
@@ -108,16 +106,29 @@ private fun PinScreenContent(
 
     val showSpinner = uiState.isCreatingAccount
 
-    val ( headerText, captionText) = when (pinPurpose) {
+    val (greetingsText, supportingText) = when (pinPurpose) {
 
         PinPurpose.UnlockAccount -> {
-            stringResource(R.string.header_text_hello_user, uiState.currentUser.orEmpty()) to
-                    stringResource(R.string.caption_text_enter_pin)
+
+            if (uiState.lockState.isPinLocked) {
+
+                val remainingSeconds = uiState.lockState.lockoutRemainingSeconds
+
+                val minutes = remainingSeconds / 60
+                val seconds = remainingSeconds % 60
+                val formattedTime = "%02d:%02d".format(minutes, seconds)
+
+                stringResource(R.string.header_text_many_attempts) to
+                        stringResource(R.string.caption_text_try_in, formattedTime)
+            } else {
+                stringResource(R.string.header_text_hello_user, uiState.currentUser.orEmpty()) to
+                        stringResource(R.string.caption_text_enter_pin)
+            }
         }
 
         is PinPurpose.CreateAccount -> {
 
-            when(uiState.pinStage){
+            when (uiState.pinStage) {
 
                 PinStage.CREATE -> {
                     stringResource(R.string.header_text_create_pin) to
@@ -175,16 +186,19 @@ private fun PinScreenContent(
                     verticalArrangement = Arrangement.spacedBy(spacing.spaceSmall)
             ) {
                 Text(
-                        text = headerText,
+                        text = greetingsText,
                         style = MaterialTheme.typography.headlineMedium,
                         color = MaterialTheme.colorScheme.onBackground,
                         textAlign = TextAlign.Center,
                 )
 
                 Text(
-                        text = captionText,
-                        modifier = Modifier.padding(horizontal = spacing.spaceTwelve * 2),
-                        style = MaterialTheme.typography.bodyMedium,
+                        text = supportingText,
+                        modifier = Modifier
+                                .padding(horizontal = spacing.spaceTwelve * 2),
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                                fontFeatureSettings = "tnum"
+                        ),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center,
                 )
@@ -234,17 +248,17 @@ private fun PinScreenContent(
                                 val isDelete = digit == -1
 
                                 val isKeyEnabled = !uiState.isCreatingAccount &&
-                                        if (isDelete) {
-                                            pin.isNotEmpty()
-                                        } else {
-                                            pin.length < PIN_LENGTH
-                                        }
+                                        !uiState.lockState.isPinLocked &&
+                                        (
+                                                if (isDelete) pin.isNotEmpty()
+                                                else pin.length < PIN_LENGTH
+                                                )
 
                                 Surface(
                                         modifier = keyModifier.semantics { role = Role.Button },
                                         enabled = isKeyEnabled,
                                         shape = RoundedCornerShape(32.dp),
-                                        color = if (isDelete)
+                                        color = if (isDelete || uiState.lockState.isPinLocked)
                                             MaterialTheme.colorScheme.primaryFixed.copy(alpha = 0.24f)
                                         else
                                             MaterialTheme.colorScheme.primaryFixed,
